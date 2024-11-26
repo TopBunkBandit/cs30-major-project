@@ -1,13 +1,14 @@
 // 2D ARCADE FIGHTING GAME
+// THIS GAME WILL NOT BE AS GOOD AS INTENDED UNTIL LATER, DONT EXPECT A GOOD GAME MR. PERSON READING THIS
 // James Mitchell
 // 11/20/24
 //
 // Extra for Experts:
 // N.A.
 // CURRENT TO DO LIST IN ORDER OF PRIORITY:
-// add forward and backward movement
-// add 'attacks'
-// add the p5.party stuff (S.O.S.)
+// Add the basic attacks (just a punch and a kick for now)
+// Add p5.party and have the game display two characters that can interact
+// Add the rest of the basic abilities (block, another punch and kick)
 
 
 
@@ -23,6 +24,10 @@ class Player{
     this.jumpVelocity = 5;
     this.isJumping = false;
     this.currentlyFalling = false;
+    this.oldTime;
+    this.punchTime = 0;
+    this.currentlyAttacking = false;
+    this.facingRight = true;
     // this.lightHit = 5;
     // this.heavyHit = 15;
 
@@ -41,7 +46,7 @@ class Player{
   falling(){
     if (this.playerY <= 400 && this.playerY + this.gravity*this.airTime < 400 ){
       if (!this.isJumping){
-        this.airTime = 0.4;
+        this.airTime = 0.41;
         this.isJumping = false;
       }
       this.playerY += this.gravity*this.airTime;
@@ -58,28 +63,103 @@ class Player{
     }
   }
   
-  crouchingDown(){
-    if (this.height === 200){
-      this.height = this.height/2;
-      this.currentlyCrouched = true;
+
+
+  //attacking and locks the player into the punch
+  //need to make the rectangle draw itself backwards (to the left)
+  lightAttackStandingPunch(){
+    if (millis() < this.oldTime + 1500 && (this.playerY === 400 || this.playerY === 500)){
+      if (millis() < this.oldTime + 750){
+        console.log("a");
+        rect(this.playerX + this.width/2,this.playerY + 60, this.punchTime,20);
+        this.currentlyAttacking = true;
+        this.punchTime += 2;
+      }
+      else{
+        console.log("b");
+        rect(this.playerX + this.width/2,this.playerY + 60, this.punchTime,20);
+        this.currentlyAttacking = true;
+        this.punchTime -= 2;
+
+      }
+    }
+    else{
+      currentlyHit = false;
+      this.currentlyAttacking = false;
+      this.punchTime = 0;
     }
   }
 
-  standingUpFromCrouch(){
-    if  (this.height === 100){
-      this.height = this.height*2;
-      this.currentlyCrouched = false;
-    }
-  }
+  playerInputs(){
+    if (!this.currentlyAttacking){
+      //crouching 
+      if (keyIsDown(17)){
+        if (this.height === 200){
+          this.height = this.height/2;
+          this.currentlyCrouched = true;
+        }
+      }
+      else{
+        if  (this.height === 100){
+          this.height = this.height*2;
+          this.currentlyCrouched = false;
+        }
+      }
+      //moving forward
+      if (keyIsDown(68)){
+        this.playerX += 1;
+        this.facingRight = true;
+      }
+      //moving backward
+      if (keyIsDown(65)){
+        this.playerX -= 1;
+        this.facingRight = false;
 
-  moveForward(){
-    this.playerX += 1;
+      }
+      //punching lightly
+      if (keyIsDown(81) && !currentlyHit){
+        this.oldTime = millis();
+        currentlyHit = true;
+      }
+
+      //this whole chunk is just jumping under diffrent conditions
+      //jumping
+      if (keyIsDown(32) && this.airTime < 0.4){
+        this.jump();
+        this.currentlyFalling = true;
+      }
+      else{
+        this.isJumping = false;
+      }
+      //falling while jumping
+      if (!this.currentlyCrouched && this.playerY + this.gravity*this.airTime < 400){
+        this.falling();
+      }
+      //standing
+      else if(!this.currentlyCrouched){
+        this.airTime = 0;
+        this.playerY = 400;
+        this.currentlyFalling = false;
+      }
+      //crouch jump/crouch mid jump
+      else if(this.currentlyCrouched && this.playerY + this.gravity*this.airTime < 500 && this.currentlyFalling){
+        this.fallingWhileCrouched();
+      }
+      //crouched
+      else{
+        this.airTime = 0;
+        this.playerY = 500;
+        console.log(2);
+      }
+    }
   }
 }
 
 
 //john is a placeholder name, change this later
 let john;
+currentlyHit = false;
+
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -88,50 +168,12 @@ function setup() {
 
 function draw() {
   background(220);
+  //floor
   rect(0,600,width,height);
+  
   john.display();
-  jump();
-  crouch();
+  // jump();
+  john.playerInputs();
+  john.lightAttackStandingPunch();
 
-}
-
-
-function jump(){
-  if (keyIsDown(32) && john.airTime < 0.4){
-    john.jump();
-    john.currentlyFalling = true;
-  }
-  else{
-    john.isJumping = false;
-  }
-
-  if (!john.currentlyCrouched && john.playerY + john.gravity*john.airTime < 400){
-    john.falling();
-  }
-  else if(!john.currentlyCrouched){
-    john.airTime = 0;
-    john.playerY = 400;
-    john.currentlyFalling = false;
-  }
-  else if(john.currentlyCrouched && john.playerY + john.gravity*john.airTime < 500 && john.currentlyFalling){
-    john.fallingWhileCrouched();
-  }
-  else{
-    john.airTime = 0;
-    john.playerY = 500;
-    console.log(2);
-  }
-}
-
-function crouch(){
-  if (keyIsDown(17)){
-    john.crouchingDown();
-  }
-  else{
-    john.standingUpFromCrouch();
-  }
-
-  if (keyIsDown(68)){
-    john.moveForward();
-  }
 }

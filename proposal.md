@@ -5,7 +5,7 @@
 ## Needs to have list
 
  - Basic fighting system including at minimum 2 punches (Heavy & Light), 2 kicks (Heavy & Light), a block, a crouch and a jump.
- - Multiple characters with 1 special move each
+ - Multiple characters with a special move each
  - A health bar for each player
  - vs AI or Player (Online)
 
