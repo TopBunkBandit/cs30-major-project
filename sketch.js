@@ -1,14 +1,16 @@
 // 2D ARCADE FIGHTING GAME
-// THIS GAME WILL NOT BE AS GOOD AS INTENDED UNTIL LATER, DONT EXPECT A GOOD GAME MR. PERSON READING THIS
+// THIS GAME WILL NOT BE AS GOOD AS INTENDED UNTIL LATER, 
+// DONT EXPECT A GOOD GAME YET MR. PERSON READING THIS
 // James Mitchell
 // 11/20/24
 //
 // Extra for Experts:
 // N.A.
 // CURRENT TO DO LIST IN ORDER OF PRIORITY:
-// Add the basic attacks (just a punch and a kick for now)
 // Add p5.party and have the game display two characters that can interact
+// REQUIRES TESTING TO SEE IF IT WORKS
 // Add the rest of the basic abilities (block, another punch and kick)
+
 
 
 
@@ -33,7 +35,13 @@ class Player{
 
   }
   display(){
-    rect(this.playerX,this.playerY,this.width,this.height);
+    shared.p1x = this.playerX;
+    shared.p1y = this.playerY;
+    shared.p1w = this.width;
+    shared.p1h = this.height;
+    rect(shared.p1x,shared.p1y,shared.p1w,shared.p1h);
+
+    //updating the shared player shape data
   }
 
   jump(){
@@ -68,18 +76,18 @@ class Player{
   //attacking and locks the player into the punch
   //need to make the rectangle draw itself backwards (to the left)
   lightAttackStandingPunch(){
-    if (millis() < this.oldTime + 1500 && (this.playerY === 400 || this.playerY === 500)){
-      if (millis() < this.oldTime + 750){
+    if (millis() < this.oldTime + 750 && (this.playerY === 400 || this.playerY === 500)){
+      if (millis() < this.oldTime + 750/2){
         console.log("a");
         rect(this.playerX + this.width/2,this.playerY + 60, this.punchTime,20);
         this.currentlyAttacking = true;
-        this.punchTime += 2;
+        this.punchTime += 4;
       }
       else{
         console.log("b");
         rect(this.playerX + this.width/2,this.playerY + 60, this.punchTime,20);
         this.currentlyAttacking = true;
-        this.punchTime -= 2;
+        this.punchTime -= 4;
 
       }
     }
@@ -117,7 +125,7 @@ class Player{
 
       }
       //punching lightly
-      if (keyIsDown(81) && !currentlyHit){
+      if (keyIsDown(81) && !currentlyHit && (this.playerY === 400 || this.playerY === 500)){
         this.oldTime = millis();
         currentlyHit = true;
       }
@@ -160,10 +168,21 @@ class Player{
 let john;
 currentlyHit = false;
 
+let shared;
+
+function preload() {
+  john = new Player(20,400);
+  partyConnect(
+    "wss://demoserver.p5party.org", 
+    "testing"
+  );
+
+  //need to put EVERY VALUE THAT IM GOING TO NEED TO DISPLAY TO THE OTHER PLAYER
+  shared = partyLoadShared("shared", { p1x: john.playerX, p1y: john.playerY, p1w: john.width, p1h: john.height});
+}
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  john = new Player(20,399);
 }
 
 function draw() {
@@ -176,4 +195,39 @@ function draw() {
   john.playerInputs();
   john.lightAttackStandingPunch();
 
+
 }
+
+
+
+
+
+
+//p5.party demo
+
+// let shared;
+
+// function preload() {
+// 	partyConnect(
+// 		"wss://demoserver.p5party.org", 
+// 		"hello_party"
+// 	);
+//   shared = partyLoadShared("shared", { x: 100, y: 100 });
+// }
+
+// function setup() {
+//   createCanvas(400, 400);
+//   noStroke();
+// }
+
+// function mousePressed() {
+//   shared.x = mouseX;
+//   shared.y = mouseY;
+// }
+
+// function draw() {
+//   background("#ffcccc");
+//   fill("#000066");
+
+//   ellipse(shared.x, shared.y, 100, 100);
+// }
