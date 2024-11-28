@@ -7,9 +7,9 @@
 // Extra for Experts:
 // N.A.
 // CURRENT TO DO LIST IN ORDER OF PRIORITY:
-// Add p5.party and have the game display two characters that can interact
+// Add p5.party and have the game display two characters that can move indepentently
 // REQUIRES TESTING TO SEE IF IT WORKS
-// Add the rest of the basic abilities (block, another punch and kick)
+// Add the rest of the basic abilities (block & kick)
 
 
 
@@ -20,7 +20,7 @@ class Player{
     this.playerY = y;
     this.height = 200;
     this.width = 50; 
-    this.gravity = 10;
+    this.gravity = 9.8;
     this.airTime = 0;
     this.currentlyCrouched = false;
     this.jumpVelocity = 5;
@@ -30,8 +30,6 @@ class Player{
     this.punchTime = 0;
     this.currentlyAttacking = false;
     this.facingRight = true;
-    // this.lightHit = 5;
-    // this.heavyHit = 15;
 
   }
   display(){
@@ -71,17 +69,17 @@ class Player{
     }
   }
   
-
-
   //attacking and locks the player into the punch
   //need to make the rectangle draw itself backwards (to the left)
-  lightAttackStandingPunch(){
+  //maybe do this by translating the grid onto the rectangle and then rotating it by PI
+  punch(){
     if (millis() < this.oldTime + 750 && (this.playerY === 400 || this.playerY === 500)){
       if (millis() < this.oldTime + 750/2){
         console.log("a");
         rect(this.playerX + this.width/2,this.playerY + 60, this.punchTime,20);
         this.currentlyAttacking = true;
         this.punchTime += 4;
+
       }
       else{
         console.log("b");
@@ -113,18 +111,17 @@ class Player{
           this.currentlyCrouched = false;
         }
       }
-      //moving forward
-      if (keyIsDown(68)){
-        this.playerX += 1;
+      //moving forward if not at the right wall
+      if (keyIsDown(68) && this.playerX !== width - this.width){
+        this.playerX += 2;
         this.facingRight = true;
       }
-      //moving backward
-      if (keyIsDown(65)){
-        this.playerX -= 1;
+      //moving backward if not at the left wall
+      if (keyIsDown(65) && this.playerX !== 0){
+        this.playerX -= 2;
         this.facingRight = false;
-
       }
-      //punching lightly
+      //punching
       if (keyIsDown(81) && !currentlyHit && (this.playerY === 400 || this.playerY === 500)){
         this.oldTime = millis();
         currentlyHit = true;
@@ -174,9 +171,8 @@ function preload() {
   john = new Player(20,400);
   partyConnect(
     "wss://demoserver.p5party.org", 
-    "testing"
+    "comp-sci30-fighting-game"
   );
-
   //need to put EVERY VALUE THAT IM GOING TO NEED TO DISPLAY TO THE OTHER PLAYER
   shared = partyLoadShared("shared", { p1x: john.playerX, p1y: john.playerY, p1w: john.width, p1h: john.height});
 }
@@ -191,10 +187,8 @@ function draw() {
   rect(0,600,width,height);
   
   john.display();
-  // jump();
   john.playerInputs();
-  john.lightAttackStandingPunch();
-
+  john.punch();
 
 }
 
