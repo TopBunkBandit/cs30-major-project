@@ -74,18 +74,42 @@ class Player{
   //maybe do this by translating the grid onto the rectangle and then rotating it by PI
   punch(){
     if (millis() < this.oldTime + 750 && (this.playerY === 400 || this.playerY === 500)){
-      if (millis() < this.oldTime + 750/2){
-        console.log("a");
-        rect(this.playerX + this.width/2,this.playerY + 60, this.punchTime,20);
-        this.currentlyAttacking = true;
-        this.punchTime += 4;
-
+      if (this.facingRight){
+        if (millis() < this.oldTime + 750/2){
+          console.log("a");
+          rect(this.playerX + this.width/2,this.playerY + 60, this.punchTime,20);
+          this.currentlyAttacking = true;
+          this.punchTime += 4;
+        }
+        else{
+          console.log("b");
+          rect(this.playerX + this.width/2,this.playerY + 60, this.punchTime,20);
+          this.currentlyAttacking = true;
+          this.punchTime -= 4;
+        }
       }
+
+      //this is the portion that will work if your facing left
+      //almost good
       else{
-        console.log("b");
-        rect(this.playerX + this.width/2,this.playerY + 60, this.punchTime,20);
-        this.currentlyAttacking = true;
-        this.punchTime -= 4;
+        
+        push();
+        translate(this.playerX,this.playerY);
+        rotate(180);
+        if (millis() < this.oldTime + 750/2){
+          console.log("c");
+          rect(-this.width/2, -120, this.punchTime,20);
+          this.currentlyAttacking = true;
+          this.punchTime += 4;
+  
+        }
+        else{
+          console.log("d");
+          rect(-this.width/2, -60, this.punchTime,20);
+          this.currentlyAttacking = true;
+          this.punchTime -= 4;
+        }
+        pop();
 
       }
     }
@@ -179,6 +203,8 @@ function preload() {
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  angleMode(DEGREES);
+  
 }
 
 function draw() {
