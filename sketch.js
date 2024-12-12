@@ -8,8 +8,13 @@
 // N.A.
 // CURRENT TO DO LIST IN ORDER OF PRIORITY:
 //add hit detection
+// - add thing to track the coords of the fist
+// - check if the fist is within the enemys coords
 //add kick and block
 //fix gravity
+//add main menu and character select
+//...
+//find or make actual sprites for the characters
 
 
 
@@ -94,7 +99,8 @@ class Player{
           this.punchTime -= 4;
         }
       }
-      //backward punch
+
+      //punch when facing left
       else{
         push();
         translate(this.playerX,this.playerY);
@@ -124,7 +130,7 @@ class Player{
   //all current possible player inputs
   playerInputs(player){
     if (!this.currentlyAttacking){      
-      //IN THEORY should let the code swap what keys its looking for
+      //lets the code swap what keys its looking for
       if (player === 1){
         this.jumpKey = 32;
         this.forwardKey = 68;
@@ -136,8 +142,8 @@ class Player{
         this.jumpKey = 38;
         this.forwardKey = 39;
         this.backwardKey = 37;
-        this.crouchKey = 16;
-        this.punchKey = 96;
+        this.crouchKey = 40;
+        this.punchKey = 16;
       }
       
       //crouching
@@ -153,7 +159,7 @@ class Player{
           this.currentlyCrouched = false;
         }
       }
-      //moving forwards, should be stopping at the left wall but is not, find out why
+      //moving forwards if not at the right wall
       if (keyIsDown(this.forwardKey) && this.playerX < width - this.width){
         this.playerX += 2;
         this.facingRight = true;
@@ -169,7 +175,6 @@ class Player{
         currentlyHit = true;
       }
 
-      //this whole chunk is just jumping under diffrent conditions
       //jumping
       if (keyIsDown(this.jumpKey) && this.airTime < 0.4){
         this.jump();
@@ -196,7 +201,6 @@ class Player{
       else{
         this.airTime = 0;
         this.playerY = 500;
-        console.log(2);
 
       }
       
@@ -240,18 +244,38 @@ function draw() {
   
   john.display();
   john.playerInputs(1);
-  john.punch();
-
+  
   jim.display();
   jim.playerInputs(2);
+
+  //put these after the drawing of the bodies to prevent the arm from going behind the other dude
+  john.punch();
   jim.punch();
 
+  playerIsHit();
 }
 
 //adding hit detection to the players, not player collisions
+//PUT A PAUSE ON THIS, ADD A THING THAT GIVES THE EXACT COORDS OF THE END OF THE ARM SO
+//THAT IT CAN CHECK IF THE COORDS ARE WITHIN THE ENEMYS COORDS, ALLOWING FOR EASIER CODE (maybe)
 function playerIsHit(){
   //use john.playerY and john.punchTime to find where the arm is
   //if it reaches jim, set a variable to true or false so it only counts the hit once
   //vise versa for jim hitting john
-
+  if (john.currentlyAttacking){
+    
+    if (john.punchTime + john.playerX + john.width/2 > jim.playerX && john.punchTime + john.playerX < jim.playerX + jim.width){
+      if (john.currentlyCrouched){
+        console.log("low blow");
+      }
+      else if (!jim.currentlyCrouched){
+        console.log("slap");
+      }
+      
+      else{
+        console.log("missed");
+      }
+    }
+  }
 }
+
