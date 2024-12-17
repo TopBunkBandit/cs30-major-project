@@ -1,6 +1,7 @@
 // 2D ARCADE FIGHTING GAME
 // THIS GAME WILL NOT BE AS GOOD AS INTENDED UNTIL LATER, 
 // DONT EXPECT A GOOD GAME YET MR. PERSON READING THIS
+// ALSO THE COMMENTS ARE DEV NOTES, THEY ARE FOR HELPING ME NOT THE READER
 // James Mitchell
 // 11/20/24
 //
@@ -8,12 +9,11 @@
 // N.A.
 // CURRENT TO DO LIST IN ORDER OF PRIORITY:
 //add hit detection
-// - add thing to track the coords of the fist
-// - check if the fist is within the enemys coords
-// - this SHOULD IN THEORY be less code/easier
+// - need to try and see if I can use jim.x and john.x as variables like attacker.x victim.x, so the code works 2 ways
+// - if not possible just put in everything in the command and have it replace like attackerY with john.playerY
 //add kick and block
-//fix gravity
-//add main menu and character select
+//fix gravity, I'm not a fan of how it is now
+//add main menu and character select 
 //...
 //make actual sprites for the characters
 
@@ -95,7 +95,7 @@ class Player{
           rect(this.playerX + this.width/2,this.playerY + 60, this.punchTime,20);
           this.currentlyAttacking = true;
           this.punchTime += 4;
-          this.punchX += 4;
+          this.punchX = this.punchTime + this.playerX + this.width/2;
           this.punchY = this.playerY + 20;
         }
         else{
@@ -117,7 +117,7 @@ class Player{
           rect(-this.width/2, -80, this.punchTime,20);
           this.currentlyAttacking = true;
           this.punchTime += 4;
-          this.punchX -= 4;
+          this.punchX = -this.punchTime + this.playerX + this.width/2;
           this.punchY = this.playerY + 20;
 
         }
@@ -132,14 +132,12 @@ class Player{
         pop();
       }
     }
-
     else{
       currentlyHit = false;
       this.currentlyAttacking = false;
       this.punchTime = 0;
     }
   }
-
   //all current possible player inputs
   playerInputs(player){
     if (!this.currentlyAttacking){      
@@ -220,33 +218,16 @@ class Player{
       
     }
   }
-
-
 }
-
-
-//john is a placeholder name, change this later
-let john;
-currentlyHit = false;
-
-let shared;
-
-// function preload() {
-
-//   partyConnect(
-//     "wss://demoserver.p5party.org", 
-//     "comp-sci30-fighting-game"
-//   );
-//   //need to put EVERY VALUE THAT IM GOING TO NEED TO DISPLAY TO THE OTHER PLAYER
-//   shared = partyLoadShared("shared", { p1x: john.playerX, p1y: john.playerY, p1w: john.width, p1h: john.height});
-// }
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   angleMode(DEGREES);
+  //names are placeholders, will change later probabaly
   john = new Player(50,400);
   jim = new Player(450,400);
   jim.facingRight = false;
+  currentlyHit = false;
 }
 
 function draw() {
@@ -268,14 +249,11 @@ function draw() {
 }
 
 //adding hit detection to the players, not player collisions
-//PUT A PAUSE ON THIS, ADD A THING THAT GIVES THE EXACT COORDS OF THE END OF THE ARM SO
-//THAT IT CAN CHECK IF THE COORDS ARE WITHIN THE ENEMYS COORDS, ALLOWING FOR EASIER CODE (maybe)
 //btw need to change this so john and jim are variables so the code can run for either by switching what is put in, half the work for 2x the code
 function playerIsHit(){
-
   if (john.currentlyAttacking){
-    if (john.punchX + john.playerX + john.width/2 > jim.playerX && john.punchX + john.playerX < jim.playerX + jim.width){
-      //works with the y not the x, find out why, asap
+    if (john.punchX > jim.playerX && john.punchX < jim.playerX + jim.width){
+      //see above message
       if (john.punchY > jim.playerY && john.punchY < jim.playerY + jim.height){
         console.log("yay");
       }
