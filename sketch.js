@@ -8,9 +8,8 @@
 // Extra for Experts:
 // N.A.
 // CURRENT TO DO LIST IN ORDER OF PRIORITY:
-//add hit detection
-// - need to try and see if I can use jim.x and john.x as variables like attacker.x victim.x, so the code works 2 ways
-// - if not possible just put in everything in the command and have it replace like attackerY with john.playerY
+//fix crouching and hitting doing odd stuff
+//add damage
 //add kick and block
 //fix gravity, I'm not a fan of how it is now
 //add main menu and character select 
@@ -245,17 +244,18 @@ function draw() {
   john.punch();
   jim.punch();
 
-  playerIsHit();
+  playerIsHit(john,jim);
+  playerIsHit(jim,john);
 }
 
 //adding hit detection to the players, not player collisions
-//btw need to change this so john and jim are variables so the code can run for either by switching what is put in, half the work for 2x the code
-function playerIsHit(){
-  if (john.currentlyAttacking){
-    if (john.punchX > jim.playerX && john.punchX < jim.playerX + jim.width){
-      //see above message
-      if (john.punchY > jim.playerY && john.punchY < jim.playerY + jim.height){
-        console.log("yay");
+//the problem lies with the player seeming to be lower than they are
+function playerIsHit(attacker,defender){
+  if (attacker.currentlyAttacking){
+    if (attacker.punchX > defender.playerX && attacker.punchX < defender.playerX + defender.width){
+      if (attacker.punchY > defender.playerY && attacker.punchY < defender.playerY + defender.height){
+        // console.log("yay");
+        console.log(jim.playerY + jim.height,john.punchY);
       }
     }
   }
