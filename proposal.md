@@ -4,7 +4,7 @@
 
 ## Needs to have list
   - ability to play the game on one keyboard 
-  - Basic fighting system including at minimum of a punche, a kick, a block, a crouch and a jump.
+  - Basic fighting system including at minimum of a punch, a kick, a block, a crouch and a jump.
   - Multiple characters with a special move each
   - A health bar for each player
   - Ability to win or lose

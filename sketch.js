@@ -8,8 +8,8 @@
 // Extra for Experts:
 // N.A.
 // CURRENT TO DO LIST IN ORDER OF PRIORITY:
-//fix crouching and hitting doing odd stuff
 //add damage
+// - works sorta, need to implement some way to prevent getting hit 2x by the same punch
 //add kick and block
 //fix gravity, I'm not a fan of how it is now
 //add main menu and character select 
@@ -43,10 +43,13 @@ class Player{
     this.backwardKey;
     this.crouchKey;
     this.punchKey;
+    this.health = 100;
+    this.currentlyHit = false;
   }
 
   //displays the players
   display(){
+    fill("white");
     rect(this.playerX,this.playerY,this.width,this.height);
     fill("black");
     if (this.facingRight){
@@ -95,15 +98,14 @@ class Player{
           this.currentlyAttacking = true;
           this.punchTime += 4;
           this.punchX = this.punchTime + this.playerX + this.width/2;
-          this.punchY = this.playerY + 20;
+          this.punchY = this.playerY + 10;
         }
         else{
           rect(this.playerX + this.width/2,this.playerY + 60, this.punchTime,20);
           this.currentlyAttacking = true;
           this.punchTime -= 4;
           this.punchX -= 4;
-          this.punchY = this.playerY + 20;
-
+          this.punchY = this.playerY + 10;
         }
       }
 
@@ -117,7 +119,7 @@ class Player{
           this.currentlyAttacking = true;
           this.punchTime += 4;
           this.punchX = -this.punchTime + this.playerX + this.width/2;
-          this.punchY = this.playerY + 20;
+          this.punchY = this.playerY + 10;
 
         }
         else{
@@ -125,17 +127,33 @@ class Player{
           this.currentlyAttacking = true;
           this.punchTime -= 4;
           this.punchX += 4;
-          this.punchY = this.playerY + 20;
+          this.punchY = this.playerY + 10;
 
         }
         pop();
       }
     }
     else{
-      currentlyHit = false;
       this.currentlyAttacking = false;
       this.punchTime = 0;
     }
+  }
+  healthBar(x,y){
+    rectMode(CORNERS);
+    fill("white");
+    rect(x, y, x + 100,y+20);
+    fill("red");
+    for (let i = 0; i < this.health; i++){
+      rect(x,y, x + i, y+20);
+
+    }
+    rectMode(CORNER);
+  }
+  hit(){
+    if (this.currentlyHit){
+      this.health -= 10;
+    }
+    this.currentlyHit = false;
   }
   //all current possible player inputs
   playerInputs(player){
@@ -181,9 +199,8 @@ class Player{
         this.facingRight = false;
       }
       //punching
-      if (keyIsDown(this.punchKey) && !currentlyHit && (this.playerY === 400 || this.playerY === 500)){
+      if (keyIsDown(this.punchKey)  && (this.playerY === 400 || this.playerY === 500)){
         this.oldTime = millis();
-        currentlyHit = true;
       }
 
       //jumping
@@ -219,6 +236,8 @@ class Player{
   }
 }
 
+let alreadyHit = false;
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
   angleMode(DEGREES);
@@ -226,37 +245,55 @@ function setup() {
   john = new Player(50,400);
   jim = new Player(450,400);
   jim.facingRight = false;
-  currentlyHit = false;
+  
 }
 
 function draw() {
   background(220);
   //floor
   rect(0,600,width,height);
-  
+  john.healthBar(100,100);
+
   john.display();
   john.playerInputs(1);
-  
+  john.hit();
+
   jim.display();
   jim.playerInputs(2);
-
-  //put these after the drawing of the bodies to prevent the arm from going behind the player models
+  jim.hit();
+  
   john.punch();
   jim.punch();
 
   playerIsHit(john,jim);
   playerIsHit(jim,john);
+  
+}
+
+function mousePressed(){
+  john.health -= 10;
 }
 
 //adding hit detection to the players, not player collisions
-//the problem lies with the player seeming to be lower than they are
 function playerIsHit(attacker,defender){
   if (attacker.currentlyAttacking){
     if (attacker.punchX > defender.playerX && attacker.punchX < defender.playerX + defender.width){
-      if (attacker.punchY > defender.playerY && attacker.punchY < defender.playerY + defender.height){
+      if (attacker.punchY > defender.playerY && attacker.punchY < defender.playerY + defender.height - 40){
         // console.log("yay");
         console.log(jim.playerY + jim.height,john.punchY);
+        //not working, figure it out silly billy
+        if (!alreadyHit){
+          defender.currentlyHit = true;
+          alreadyHit = true;
+        }
+        alreadyHit = true;
       }
     }
   }
+  //fix
+  // else{
+  //   alreadyHit = false;
+  // }
 }
+
+
