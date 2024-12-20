@@ -10,6 +10,7 @@
 // CURRENT TO DO LIST IN ORDER OF PRIORITY:
 //add damage
 // - works sorta, need to implement some way to prevent getting hit 2x by the same punch
+// - do I-frames it will work better
 //add kick and block
 //fix gravity, I'm not a fan of how it is now
 //add main menu and character select 
@@ -45,6 +46,7 @@ class Player{
     this.punchKey;
     this.health = 100;
     this.currentlyHit = false;
+    this.donePunch = false;
   }
 
   //displays the players
@@ -99,6 +101,8 @@ class Player{
           this.punchTime += 4;
           this.punchX = this.punchTime + this.playerX + this.width/2;
           this.punchY = this.playerY + 10;
+          this.donePunch = false;
+
         }
         else{
           rect(this.playerX + this.width/2,this.playerY + 60, this.punchTime,20);
@@ -106,6 +110,8 @@ class Player{
           this.punchTime -= 4;
           this.punchX -= 4;
           this.punchY = this.playerY + 10;
+          this.donePunch = false;
+
         }
       }
 
@@ -120,6 +126,8 @@ class Player{
           this.punchTime += 4;
           this.punchX = -this.punchTime + this.playerX + this.width/2;
           this.punchY = this.playerY + 10;
+          this.donePunch = false;
+
 
         }
         else{
@@ -128,6 +136,8 @@ class Player{
           this.punchTime -= 4;
           this.punchX += 4;
           this.punchY = this.playerY + 10;
+          this.donePunch = false;
+
 
         }
         pop();
@@ -135,6 +145,7 @@ class Player{
     }
     else{
       this.currentlyAttacking = false;
+      this.donePunch = true;
       this.punchTime = 0;
     }
   }
@@ -145,15 +156,14 @@ class Player{
     fill("red");
     for (let i = 0; i < this.health; i++){
       rect(x,y, x + i, y+20);
-
     }
     rectMode(CORNER);
   }
   hit(){
     if (this.currentlyHit){
       this.health -= 10;
+      this.currentlyHit = false;
     }
-    this.currentlyHit = false;
   }
   //all current possible player inputs
   playerInputs(player){
@@ -236,7 +246,7 @@ class Player{
   }
 }
 
-let alreadyHit = false;
+let lastHit = 0;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -252,16 +262,21 @@ function draw() {
   background(220);
   //floor
   rect(0,600,width,height);
+  //TESTING CURRENTLY
   john.healthBar(100,100);
+  //
 
+  //required functions for player 1
   john.display();
   john.playerInputs(1);
   john.hit();
 
+  //required functions for player 2
   jim.display();
   jim.playerInputs(2);
   jim.hit();
   
+  //attacking
   john.punch();
   jim.punch();
 
@@ -277,23 +292,20 @@ function mousePressed(){
 //adding hit detection to the players, not player collisions
 function playerIsHit(attacker,defender){
   if (attacker.currentlyAttacking){
+    // console.log(jim.donePunch);
     if (attacker.punchX > defender.playerX && attacker.punchX < defender.playerX + defender.width){
       if (attacker.punchY > defender.playerY && attacker.punchY < defender.playerY + defender.height - 40){
-        // console.log("yay");
-        console.log(jim.playerY + jim.height,john.punchY);
         //not working, figure it out silly billy
-        if (!alreadyHit){
+        if (lastHit < millis() - 1000){
           defender.currentlyHit = true;
-          alreadyHit = true;
+          console.log("yay");
         }
-        alreadyHit = true;
+        lastHit = millis();
       }
     }
   }
   //fix
-  // else{
-  //   alreadyHit = false;
-  // }
+
 }
 
 
