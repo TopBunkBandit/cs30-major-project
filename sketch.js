@@ -47,6 +47,7 @@ class Player{
     this.health = 100;
     this.currentlyHit = false;
     this.donePunch = false;
+    this.lastHit = 0;
   }
 
   //displays the players
@@ -161,7 +162,12 @@ class Player{
   }
   hit(){
     if (this.currentlyHit){
-      this.health -= 10;
+      if (this.currentlyCrouched){
+        this.health -= 15;
+      }
+      else{
+        this.health -= 10;
+      }
       this.currentlyHit = false;
     }
   }
@@ -261,9 +267,14 @@ function setup() {
 function draw() {
   background(220);
   //floor
+
+  // if (john.health <= 0){
+  // }
   rect(0,600,width,height);
   //TESTING CURRENTLY
   john.healthBar(100,100);
+  jim.healthBar(450,100);
+
   //
 
   //required functions for player 1
@@ -296,11 +307,10 @@ function playerIsHit(attacker,defender){
     if (attacker.punchX > defender.playerX && attacker.punchX < defender.playerX + defender.width){
       if (attacker.punchY > defender.playerY && attacker.punchY < defender.playerY + defender.height - 40){
         //not working, figure it out silly billy
-        if (lastHit < millis() - 1000){
+        if (defender.lastHit < millis() - 1000){
           defender.currentlyHit = true;
-          console.log("yay");
+          defender.lastHit = millis();
         }
-        lastHit = millis();
       }
     }
   }
