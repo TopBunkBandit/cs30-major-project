@@ -8,9 +8,6 @@
 // Extra for Experts:
 // N.A.
 // CURRENT TO DO LIST IN ORDER OF PRIORITY:
-//add damage
-// - works sorta, need to implement some way to prevent getting hit 2x by the same punch
-// - do I-frames it will work better
 //add kick and block
 //fix gravity, I'm not a fan of how it is now
 //add main menu and character select 
@@ -23,31 +20,42 @@
 class Player{
   constructor(x,y){
     //organize this sometime
+    
+    //player model
     this.playerX = x;
     this.playerY = y;
     this.height = 200;
     this.width = 50; 
+    this.facingRight = true;
+    this.health = 100;
+
+    //jumping
     this.gravity = 9.8;
     this.airTime = 0;
-    this.currentlyCrouched = false;
     this.jumpVelocity = 5;
     this.isJumping = false;
-    this.currentlyFalling = false;
+    
+    //punching
     this.oldTime;
     this.punchTime = 0;
     this.punchX = 0;
     this.punchY = 0;
+    this.lastHit = 0;
     this.currentlyAttacking = false;
-    this.facingRight = true;
+    this.currentlyHit = false;
+    this.donePunch = false;
+    
+    //action keys
     this.jumpKey;
     this.forwardKey;
     this.backwardKey;
     this.crouchKey;
     this.punchKey;
-    this.health = 100;
-    this.currentlyHit = false;
-    this.donePunch = false;
-    this.lastHit = 0;
+    this.blockKey;
+    
+    //movement
+    this.currentlyFalling = false;
+    this.currentlyCrouched = false;
   }
 
   //displays the players
@@ -129,7 +137,6 @@ class Player{
           this.punchY = this.playerY + 10;
           this.donePunch = false;
 
-
         }
         else{
           rect(-this.width/2, -80, this.punchTime,20);
@@ -149,6 +156,9 @@ class Player{
       this.donePunch = true;
       this.punchTime = 0;
     }
+  }
+  block(){
+    
   }
   healthBar(x,y){
     rectMode(CORNERS);
@@ -216,6 +226,9 @@ class Player{
       }
       //punching
       if (keyIsDown(this.punchKey)  && (this.playerY === 400 || this.playerY === 500)){
+        this.oldTime = millis();
+      }
+      if (keyIsDown(this.blockKey)  && (this.playerY === 400 || this.playerY === 500)){
         this.oldTime = millis();
       }
 
