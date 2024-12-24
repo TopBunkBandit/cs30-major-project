@@ -56,6 +56,9 @@ class Player{
     //movement
     this.currentlyFalling = false;
     this.currentlyCrouched = false;
+
+    //misc.
+    this.isBlocking = false;
   }
 
   //displays the players
@@ -157,9 +160,6 @@ class Player{
       this.punchTime = 0;
     }
   }
-  block(){
-    
-  }
   healthBar(x,y){
     rectMode(CORNERS);
     fill("white");
@@ -192,6 +192,7 @@ class Player{
         this.backwardKey = 65;
         this.crouchKey = 17;
         this.punchKey = 81;
+        this.blockKey = 69;
       }
       else{
         this.jumpKey = 38;
@@ -199,6 +200,7 @@ class Player{
         this.backwardKey = 37;
         this.crouchKey = 40;
         this.punchKey = 16;
+        this.blockKey = 13;
       }
       
       //crouching
@@ -228,9 +230,18 @@ class Player{
       if (keyIsDown(this.punchKey)  && (this.playerY === 400 || this.playerY === 500)){
         this.oldTime = millis();
       }
-      if (keyIsDown(this.blockKey)  && (this.playerY === 400 || this.playerY === 500)){
-        this.oldTime = millis();
+
+      if(keyIsDown(this.blockKey) && (this.playerY === 400 || this.playerY === 500)){
+        this.isBlocking = true
       }
+      else{
+        this.isBlocking = false
+      }
+
+      //reword for kicks
+      // if (keyIsDown(this.blockKey)  && (this.playerY === 400 || this.playerY === 500)){
+      //   this.oldTime = millis();
+      // }
 
       //jumping
       if (keyIsDown(this.jumpKey) && this.airTime < 0.4){
