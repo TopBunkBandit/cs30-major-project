@@ -43,7 +43,6 @@ class Player{
     this.lastHit = 0;
     this.currentlyAttacking = false;
     this.currentlyHit = false;
-    this.donePunch = false;
     
     //action keys
     this.jumpKey;
@@ -52,6 +51,7 @@ class Player{
     this.crouchKey;
     this.punchKey;
     this.blockKey;
+    this.kickKey;
     
     //movement
     this.currentlyFalling = false;
@@ -59,6 +59,9 @@ class Player{
 
     //misc.
     this.isBlocking = false;
+    this.legRotation = 0
+    this.legDown = false;
+    this.kickTime;
   }
 
   //displays the players
@@ -139,7 +142,6 @@ class Player{
           this.punchX = -this.punchTime + this.playerX + this.width/2;
           this.punchY = this.playerY + 10;
           this.donePunch = false;
-
         }
         else{
           rect(-this.width/2, -80, this.punchTime,20);
@@ -148,8 +150,6 @@ class Player{
           this.punchX += 4;
           this.punchY = this.playerY + 10;
           this.donePunch = false;
-
-
         }
         pop();
       }
@@ -181,6 +181,42 @@ class Player{
       this.currentlyHit = false;
     }
   }
+  kick(){
+    if (this.kickTime > millis() - 1290){
+      if (this.playerY === 400 || this.playerY === 500){
+        //forward punch
+        if (this.facingRight){
+          if (this.legRotation > -75 && !this.legDown){
+            this.legRotation -= 2
+            this.currentlyAttacking = true;
+            console.log(this.legRotation)
+            push()
+            translate(this.playerX + this.width/2,this.playerY + this.height/3 + this.height/3);
+            rotate(this.legRotation);
+            rect(0,0, 20, this.height/3);
+            pop()
+          }
+          else{
+            this.legDown = true;
+            this.legRotation += 2
+            push()
+            translate(this.playerX + this.width/2 ,this.playerY + this.height/3 + this.height/3);
+            console.log('')
+            
+            rotate(this.legRotation)
+            rect(0,0, 20,this.height/3);
+            pop()
+            this.currentlyAttacking = true;
+          }
+        }
+      }
+    }
+    else{
+      this.currentlyAttacking = false;
+      this.legDown = false;
+      this.legRotation = 0;
+    }
+  }
   //all current possible player inputs
   playerInputs(player){
     if (!this.currentlyAttacking){      
@@ -193,6 +229,7 @@ class Player{
         this.crouchKey = 17;
         this.punchKey = 81;
         this.blockKey = 69;
+        this.kickKey = 70;1
       }
       else{
         this.jumpKey = 38;
@@ -201,6 +238,7 @@ class Player{
         this.crouchKey = 40;
         this.punchKey = 16;
         this.blockKey = 13;
+        this.kickKey = 96;
       }
       
       //crouching
@@ -232,6 +270,7 @@ class Player{
       }
 
       if(keyIsDown(this.blockKey) && (this.playerY === 400 || this.playerY === 500)){
+        rect(this.playerX + 40,this.playerY+20,20,this.height/2)
         this.isBlocking = true
       }
       else{
@@ -239,9 +278,9 @@ class Player{
       }
 
       //reword for kicks
-      // if (keyIsDown(this.blockKey)  && (this.playerY === 400 || this.playerY === 500)){
-      //   this.oldTime = millis();
-      // }
+      if (keyIsDown(this.kickKey)  && (this.playerY === 400 || this.playerY === 500)){
+        this.kickTime = millis()
+      }
 
       //jumping
       if (keyIsDown(this.jumpKey) && this.airTime < 0.4){
@@ -282,8 +321,8 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   angleMode(DEGREES);
   //names are placeholders, will change later probabaly
-  john = new Player(50,400);
-  jim = new Player(450,400);
+  john = new Player(100,400);
+  jim = new Player(windowWidth - 100,400);
   jim.facingRight = false;
   
 }
@@ -297,7 +336,7 @@ function draw() {
   rect(0,600,width,height);
   //TESTING CURRENTLY
   john.healthBar(100,100);
-  jim.healthBar(450,100);
+  jim.healthBar(windowWidth - 200,100);
 
   //
 
@@ -315,6 +354,9 @@ function draw() {
   john.punch();
   jim.punch();
 
+  john.kick();
+  jim.kick();
+
   playerIsHit(john,jim);
   playerIsHit(jim,john);
   
@@ -326,19 +368,18 @@ function mousePressed(){
 
 //adding hit detection to the players, not player collisions
 function playerIsHit(attacker,defender){
-  if (attacker.currentlyAttacking){
-    // console.log(jim.donePunch);
-    if (attacker.punchX > defender.playerX && attacker.punchX < defender.playerX + defender.width){
-      if (attacker.punchY > defender.playerY && attacker.punchY < defender.playerY + defender.height - 40){
-        //not working, figure it out silly billy
-        if (defender.lastHit < millis() - 1000){
-          defender.currentlyHit = true;
-          defender.lastHit = millis();
+  if (attacker.currentlyAttacking && !defender.isBlocking){
+      if (attacker.punchX > defender.playerX && attacker.punchX < defender.playerX + defender.width){
+        if (attacker.punchY > defender.playerY && attacker.punchY < defender.playerY + defender.height - 40){
+          //not working, figure it out silly billy
+          if (defender.lastHit < millis() - 1000){
+            defender.currentlyHit = true;
+            defender.lastHit = millis();
+          }
         }
       }
-    }
+    
   }
-  //fix
 
 }
 
