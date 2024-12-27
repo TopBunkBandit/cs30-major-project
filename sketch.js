@@ -13,6 +13,8 @@
 //add main menu and character select 
 //...
 //make actual sprites for the characters
+//GREAT IDEA, PUT SPRITES OVER THE CURRENT THINGS AND KEEP THEM AS HITBOXES
+//THAT WAY THE HITBOXES DONT HAVE TO LOOK AWESOME
 
 
 
@@ -62,6 +64,12 @@ class Player{
     this.legRotation = 0
     this.legDown = false;
     this.kickTime;
+    this.legX = 0
+    this.legY = 0
+    this.currentlyKicking = false;
+    this.kickBalls = 0;
+
+    
   }
 
   //displays the players
@@ -188,38 +196,46 @@ class Player{
         if (this.facingRight){
           if (this.legRotation > -75 && !this.legDown){
             this.legRotation -= 2
-            this.currentlyAttacking = true;
-            console.log(this.legRotation)
+            this.currentlyKicking = true;
+            // console.log(this.legRotation)
             push()
             translate(this.playerX + this.width/2,this.playerY + this.height/3 + this.height/3);
             rotate(this.legRotation);
             rect(0,0, 20, this.height/3);
             pop()
+            this.kickBalls += 1
+
+            this.legX = this.playerX + this.width/2 + this.kickBalls;
+            this.legY = this.playerY + this.height/3 + this.height/3 + this.kickBalls;
           }
           else{
             this.legDown = true;
             this.legRotation += 2
             push()
             translate(this.playerX + this.width/2 ,this.playerY + this.height/3 + this.height/3);
-            console.log('')
+            // console.log('')
             
             rotate(this.legRotation)
             rect(0,0, 20,this.height/3);
             pop()
-            this.currentlyAttacking = true;
+            this.currentlyKicking = true;
+            
+            this.kickBalls -= 1
+            this.legX = this.playerX + this.width/2 + this.kickBalls;
+            this.legY = this.playerY + this.height/3 + this.height/3 + this.kickBalls;
           }
         }
       }
     }
     else{
-      this.currentlyAttacking = false;
+      this.currentlyKicking = false;
       this.legDown = false;
       this.legRotation = 0;
     }
   }
   //all current possible player inputs
   playerInputs(player){
-    if (!this.currentlyAttacking){      
+    if (!this.currentlyAttacking && !this.currentlyKicking){      
       //lets the code swap what keys its looking for
       //consider putting these in their own function and calling the whole thing during setup
       if (player === 1){
@@ -338,7 +354,7 @@ function draw() {
   john.healthBar(100,100);
   jim.healthBar(windowWidth - 200,100);
 
-  //
+
 
   //required functions for player 1
   john.display();
@@ -368,15 +384,23 @@ function mousePressed(){
 
 //adding hit detection to the players, not player collisions
 function playerIsHit(attacker,defender){
-  if (attacker.currentlyAttacking && !defender.isBlocking){
-      if (attacker.punchX > defender.playerX && attacker.punchX < defender.playerX + defender.width){
-        if (attacker.punchY > defender.playerY && attacker.punchY < defender.playerY + defender.height - 40){
+  if ((attacker.currentlyAttacking || attacker.currentlyKicking) && !defender.isBlocking){
+      if ((attacker.punchX > defender.playerX && attacker.punchX < defender.playerX + defender.width) || (attacker.legX > defender.playerX && attacker.legX < defender.playerX + defender.width)){
+        if ((attacker.punchY > defender.playerY && attacker.punchY < defender.playerY + defender.height - 40) || (attacker.legY > defender.playerY && attacker.legY < defender.playerY + defender.height)){
+          console.log('y')
           //not working, figure it out silly billy
           if (defender.lastHit < millis() - 1000){
             defender.currentlyHit = true;
             defender.lastHit = millis();
           }
         }
+        else{
+          console.log('n')
+        }
+      }
+      else{
+        console.log('i')
+
       }
     
   }
