@@ -203,25 +203,57 @@ class Player{
             rotate(this.legRotation);
             rect(0,0, 20, this.height/3);
             pop()
-            this.kickBalls += 1
-
-            this.legX = this.playerX + this.width/2 + this.kickBalls;
+            this.kickBalls -= 1
+            this.legX = this.playerX + this.width + this.kickBalls;
             this.legY = this.playerY + this.height/3 + this.height/3 + this.kickBalls;
           }
           else{
             this.legDown = true;
             this.legRotation += 2
             push()
-            translate(this.playerX + this.width/2 ,this.playerY + this.height/3 + this.height/3);
-            // console.log('')
-            
+            rectMode(CORNERS);
+            translate(this.playerX + this.width/2 ,this.playerY + this.height/3 + this.height/3);            
+            rotate(this.legRotation);
+            rect(0,0, 20,this.height/3);
+            pop();
+            this.currentlyKicking = true;
+            this.kickBalls += 1
+            this.legX = this.playerX + this.width + this.kickBalls;
+            this.legY = this.playerY + this.height/3 + this.height/3 - this.kickBalls;
+          }
+        }
+        else{
+          if (this.legRotation > -75 && !this.legDown){
+            this.legRotation -= 2;
+            this.currentlyKicking = true;
+            // console.log(this.legRotation)
+            push()
+            rectMode(CORNERS);
+            translate(this.playerX + this.width/2,this.playerY + this.height/3 + this.height/3);
+            // rotate(180)
+            // push()
+            rotate(this.legRotation);
+            rect(0,0, 20, this.height/3);
+            // pop()
+            pop()
+            this.kickBalls += 1
+            this.legX = this.playerX + this.width + this.kickBalls;
+            this.legY = this.playerY + this.height/3 + this.height/3 - this.kickBalls;
+          }
+          else{
+            this.legDown = true;
+            this.legRotation += 2
+            push()
+            translate(this.playerX + this.width/2 ,this.playerY + this.height/3 + this.height/3);    
+            // rotate(180)
+            // push()
             rotate(this.legRotation)
             rect(0,0, 20,this.height/3);
+            // pop()
             pop()
             this.currentlyKicking = true;
-            
             this.kickBalls -= 1
-            this.legX = this.playerX + this.width/2 + this.kickBalls;
+            this.legX = this.playerX + this.width + this.kickBalls;
             this.legY = this.playerY + this.height/3 + this.height/3 + this.kickBalls;
           }
         }
@@ -354,7 +386,7 @@ function draw() {
   john.healthBar(100,100);
   jim.healthBar(windowWidth - 200,100);
 
-
+  // console.log(john.legX,jim.playerX)
 
   //required functions for player 1
   john.display();
@@ -375,6 +407,8 @@ function draw() {
 
   playerIsHit(john,jim);
   playerIsHit(jim,john);
+  john.punchX = 0;
+  jim.punchX = 0;
   
 }
 
@@ -385,7 +419,7 @@ function mousePressed(){
 //adding hit detection to the players, not player collisions
 function playerIsHit(attacker,defender){
   if ((attacker.currentlyAttacking || attacker.currentlyKicking) && !defender.isBlocking){
-      if ((attacker.punchX > defender.playerX && attacker.punchX < defender.playerX + defender.width) || (attacker.legX > defender.playerX && attacker.legX < defender.playerX + defender.width)){
+      if ((attacker.punchX > defender.playerX && attacker.punchX < defender.playerX + defender.width) || (attacker.legX  > defender.playerX && attacker.legX - attacker.width/2 < defender.playerX + defender.width)){
         if ((attacker.punchY > defender.playerY && attacker.punchY < defender.playerY + defender.height - 40) || (attacker.legY > defender.playerY && attacker.legY < defender.playerY + defender.height)){
           console.log('y')
           //not working, figure it out silly billy
@@ -399,7 +433,7 @@ function playerIsHit(attacker,defender){
         }
       }
       else{
-        console.log('i')
+        // console.log('i')
 
       }
     
