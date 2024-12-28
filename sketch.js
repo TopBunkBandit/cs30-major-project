@@ -204,7 +204,7 @@ class Player{
             rect(0,0, 20, this.height/3);
             pop()
             this.kickBalls -= 1
-            this.legX = this.playerX + this.width + this.kickBalls;
+            this.legX = this.playerX + this.width/2 + this.kickBalls;
             this.legY = this.playerY + this.height/3 + this.height/3 + this.kickBalls;
           }
           else{
@@ -218,42 +218,36 @@ class Player{
             pop();
             this.currentlyKicking = true;
             this.kickBalls += 1
-            this.legX = this.playerX + this.width + this.kickBalls;
+            this.legX = this.playerX + this.width/2 + this.kickBalls;
             this.legY = this.playerY + this.height/3 + this.height/3 - this.kickBalls;
           }
         }
         else{
-          if (this.legRotation > -75 && !this.legDown){
-            this.legRotation -= 2;
+          if (this.legRotation < 75 && !this.legDown){
+            this.legRotation += 2;
             this.currentlyKicking = true;
-            // console.log(this.legRotation)
-            push()
-            rectMode(CORNERS);
-            translate(this.playerX + this.width/2,this.playerY + this.height/3 + this.height/3);
-            // rotate(180)
-            // push()
+            // console.log(this.legRotation);
+            push();
+            rectMode(CORNER);
+            translate(this.playerX + this.width/2 ,this.playerY + this.height/3 + this.height/3);
             rotate(this.legRotation);
             rect(0,0, 20, this.height/3);
-            // pop()
-            pop()
-            this.kickBalls += 1
-            this.legX = this.playerX + this.width + this.kickBalls;
+            pop();
+            this.kickBalls -= 1;
+            this.legX = this.playerX + this.width/2 + this.kickBalls;
             this.legY = this.playerY + this.height/3 + this.height/3 - this.kickBalls;
           }
           else{
             this.legDown = true;
-            this.legRotation += 2
-            push()
+            this.legRotation -= 2;
+            push();
             translate(this.playerX + this.width/2 ,this.playerY + this.height/3 + this.height/3);    
-            // rotate(180)
-            // push()
-            rotate(this.legRotation)
+            rotate(this.legRotation);
             rect(0,0, 20,this.height/3);
-            // pop()
-            pop()
+            pop();
             this.currentlyKicking = true;
-            this.kickBalls -= 1
-            this.legX = this.playerX + this.width + this.kickBalls;
+            this.kickBalls += 1
+            this.legX = this.playerX  + this.kickBalls;
             this.legY = this.playerY + this.height/3 + this.height/3 + this.kickBalls;
           }
         }
@@ -386,7 +380,7 @@ function draw() {
   john.healthBar(100,100);
   jim.healthBar(windowWidth - 200,100);
 
-  // console.log(john.legX,jim.playerX)
+  // console.log(john.legX,mouseX)
 
   //required functions for player 1
   john.display();
