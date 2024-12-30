@@ -203,8 +203,8 @@ class Player{
             rotate(this.legRotation);
             rect(0,0, 20, this.height/3);
             pop()
-            this.kickBalls -= 1
-            this.legX = this.playerX + this.width/2 + this.kickBalls;
+            this.kickBalls += 1
+            this.legX = this.playerX + this.width + this.kickBalls;
             this.legY = this.playerY + this.height/3 + this.height/3 + this.kickBalls;
           }
           else{
@@ -217,8 +217,8 @@ class Player{
             rect(0,0, 20,this.height/3);
             pop();
             this.currentlyKicking = true;
-            this.kickBalls += 1
-            this.legX = this.playerX + this.width/2 + this.kickBalls;
+            this.kickBalls -= 1
+            this.legX = this.playerX + this.width + this.kickBalls;
             this.legY = this.playerY + this.height/3 + this.height/3 - this.kickBalls;
           }
         }
@@ -234,7 +234,7 @@ class Player{
             rect(0,0, 20, this.height/3);
             pop();
             this.kickBalls -= 1;
-            this.legX = this.playerX + this.width/2 + this.kickBalls;
+            this.legX = this.playerX + this.width/2  + this.kickBalls;
             this.legY = this.playerY + this.height/3 + this.height/3 - this.kickBalls;
           }
           else{
@@ -247,7 +247,7 @@ class Player{
             pop();
             this.currentlyKicking = true;
             this.kickBalls += 1
-            this.legX = this.playerX  + this.kickBalls;
+            this.legX = this.playerX + this.width/2 + this.kickBalls;
             this.legY = this.playerY + this.height/3 + this.height/3 + this.kickBalls;
           }
         }
@@ -419,7 +419,12 @@ function playerIsHit(attacker,defender){
           //not working, figure it out silly billy
           if (defender.lastHit < millis() - 1000){
             defender.currentlyHit = true;
-            defender.lastHit = millis();
+            if(attacker.currentlyKicking){
+              defender.lastHit = millis() + 500;
+            }
+            else{
+              defender.lastHit = millis()
+            }
           }
         }
         else{
