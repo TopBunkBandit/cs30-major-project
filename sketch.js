@@ -8,9 +8,8 @@
 // Extra for Experts:
 // N.A.
 // CURRENT TO DO LIST IN ORDER OF PRIORITY:
-//add kick and block
-//fix gravity, I'm not a fan of how it is now
 //add main menu and character select 
+//fix gravity, I'm not a fan of how it is now
 //...
 //make actual sprites for the characters
 //GREAT IDEA, PUT SPRITES OVER THE CURRENT THINGS AND KEEP THEM AS HITBOXES
@@ -61,11 +60,11 @@ class Player{
 
     //misc.
     this.isBlocking = false;
-    this.legRotation = 0
+    this.legRotation = 0;
     this.legDown = false;
     this.kickTime;
-    this.legX = 0
-    this.legY = 0
+    this.legX = 0;
+    this.legY = 0;
     this.currentlyKicking = false;
     this.kickBalls = 0;
 
@@ -195,31 +194,31 @@ class Player{
         //forward punch
         if (this.facingRight){
           if (this.legRotation > -75 && !this.legDown){
-            this.legRotation -= 2
+            this.legRotation -= 2;
             this.currentlyKicking = true;
             // console.log(this.legRotation)
-            push()
+            push();
             translate(this.playerX + this.width/2,this.playerY + this.height/3 + this.height/3);
             rotate(this.legRotation);
             rect(0,0, 20, this.height/3);
-            pop()
-            this.kickBalls -= 1
-            this.legX = this.playerX + this.width/2 + this.kickBalls;
+            pop();
+            this.kickBalls += 1;
+            this.legX = this.playerX + this.width + this.kickBalls;
             this.legY = this.playerY + this.height/3 + this.height/3 + this.kickBalls;
           }
           else{
             this.legDown = true;
-            this.legRotation += 2
-            push()
+            this.legRotation += 2;
+            push();
             rectMode(CORNERS);
             translate(this.playerX + this.width/2 ,this.playerY + this.height/3 + this.height/3);            
             rotate(this.legRotation);
             rect(0,0, 20,this.height/3);
             pop();
             this.currentlyKicking = true;
-            this.kickBalls += 1
-            this.legX = this.playerX + this.width/2 + this.kickBalls;
-            this.legY = this.playerY + this.height/3 + this.height/3 - this.kickBalls;
+            this.kickBalls -= 1;
+            this.legX = this.playerX + this.width + this.kickBalls;
+            this.legY = this.playerY + this.height/3 + this.height/3 + this.kickBalls;
           }
         }
         else{
@@ -234,7 +233,7 @@ class Player{
             rect(0,0, 20, this.height/3);
             pop();
             this.kickBalls -= 1;
-            this.legX = this.playerX + this.width/2 + this.kickBalls;
+            this.legX = this.playerX + this.width/3 + this.kickBalls;
             this.legY = this.playerY + this.height/3 + this.height/3 - this.kickBalls;
           }
           else{
@@ -246,8 +245,8 @@ class Player{
             rect(0,0, 20,this.height/3);
             pop();
             this.currentlyKicking = true;
-            this.kickBalls += 1
-            this.legX = this.playerX  + this.kickBalls;
+            this.kickBalls += 1;
+            this.legX = this.playerX + this.width/3 + this.kickBalls;
             this.legY = this.playerY + this.height/3 + this.height/3 + this.kickBalls;
           }
         }
@@ -271,7 +270,7 @@ class Player{
         this.crouchKey = 17;
         this.punchKey = 81;
         this.blockKey = 69;
-        this.kickKey = 70;1
+        this.kickKey = 70;
       }
       else{
         this.jumpKey = 38;
@@ -310,20 +309,16 @@ class Player{
       if (keyIsDown(this.punchKey)  && (this.playerY === 400 || this.playerY === 500)){
         this.oldTime = millis();
       }
-
       if(keyIsDown(this.blockKey) && (this.playerY === 400 || this.playerY === 500)){
-        rect(this.playerX + 40,this.playerY+20,20,this.height/2)
-        this.isBlocking = true
+        rect(this.playerX + 40,this.playerY+20,20,this.height/2);
+        this.isBlocking = true;
       }
       else{
-        this.isBlocking = false
+        this.isBlocking = false;
       }
-
-      //reword for kicks
-      if (keyIsDown(this.kickKey)  && (this.playerY === 400 || this.playerY === 500)){
-        this.kickTime = millis()
+      if (keyIsDown(this.kickKey)  && this.playerY === 400){
+        this.kickTime = millis();
       }
-
       //jumping
       if (keyIsDown(this.jumpKey) && this.airTime < 0.4){
         this.jump();
@@ -350,14 +345,17 @@ class Player{
       else{
         this.airTime = 0;
         this.playerY = 500;
-
       }
-      
     }
   }
 }
 
 let lastHit = 0;
+let gameMode = "character selection";
+let characterSelectBoxX;
+let characterSelectBoxY = 250;
+let characterSelectBoxSideLength = 100;
+let mouseHoveringOver = 'none';
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -366,6 +364,8 @@ function setup() {
   john = new Player(100,400);
   jim = new Player(windowWidth - 100,400);
   jim.facingRight = false;
+  characterSelectBoxX = windowWidth;
+
   
 }
 
@@ -373,14 +373,22 @@ function draw() {
   background(220);
   //floor
 
-  // if (john.health <= 0){
-  // }
+  if (gameMode === "character selection"){
+    characterSelect();
+
+  }
+
+  else if (gameMode === x){
+    
+  }
+
+  else{
+
+  }
+  fill('white')
   rect(0,600,width,height);
-  //TESTING CURRENTLY
   john.healthBar(100,100);
   jim.healthBar(windowWidth - 200,100);
-
-  // console.log(john.legX,mouseX)
 
   //required functions for player 1
   john.display();
@@ -408,31 +416,67 @@ function draw() {
 
 function mousePressed(){
   john.health -= 10;
+  if (mouseHoveringOver === "1"){
+    
+
+  }
+  else if(mouseHoveringOver === "2"){
+
+  }
+  else{}
 }
+
+function characterSelect(){
+  background("grey");
+  
+  fill("black");
+  
+  //changing if the first box is selected
+  if (mouseX >= characterSelectBoxX/4 && mouseX <= characterSelectBoxX/4 + characterSelectBoxSideLength && mouseY >= characterSelectBoxY && mouseY <= characterSelectBoxY + characterSelectBoxSideLength){
+    fill("green");    
+    mouseHoveringOver = '1';
+  }
+  else{
+    fill("white");
+    mouseHoveringOver = 'none';
+  }
+  rect(characterSelectBoxX/4,characterSelectBoxY,characterSelectBoxSideLength,characterSelectBoxSideLength);
+  
+  //same code but for the second box
+  if (mouseX >= characterSelectBoxX/2 && mouseX <= characterSelectBoxX/2 + characterSelectBoxSideLength && mouseY >= characterSelectBoxY && mouseY <= characterSelectBoxY + characterSelectBoxSideLength){
+    fill("green");    
+    mouseHoveringOver = '2';
+  }
+  else{
+    fill("white");
+    mouseHoveringOver = 'none';
+  }
+  rect(characterSelectBoxX/2,characterSelectBoxY,characterSelectBoxSideLength,characterSelectBoxSideLength);
+
+  //text for which character is which
+  fill("white");  
+  text("Character A",characterSelectBoxX/4,characterSelectBoxY - 50);
+  text("Character B",characterSelectBoxX/2, characterSelectBoxY - 50);
+}
+
 
 //adding hit detection to the players, not player collisions
 function playerIsHit(attacker,defender){
   if ((attacker.currentlyAttacking || attacker.currentlyKicking) && !defender.isBlocking){
-      if ((attacker.punchX > defender.playerX && attacker.punchX < defender.playerX + defender.width) || (attacker.legX  > defender.playerX && attacker.legX - attacker.width/2 < defender.playerX + defender.width)){
-        if ((attacker.punchY > defender.playerY && attacker.punchY < defender.playerY + defender.height - 40) || (attacker.legY > defender.playerY && attacker.legY < defender.playerY + defender.height)){
-          console.log('y')
-          //not working, figure it out silly billy
-          if (defender.lastHit < millis() - 1000){
-            defender.currentlyHit = true;
-            defender.lastHit = millis();
-          }
-        }
-        else{
-          console.log('n')
+    if (attacker.punchX > defender.playerX && attacker.punchX < defender.playerX + defender.width || attacker.legX  > defender.playerX && attacker.legX - attacker.width/2 < defender.playerX + defender.width){
+      if (attacker.punchY > defender.playerY && attacker.punchY < defender.playerY + defender.height - 40 || attacker.legY > defender.playerY && attacker.legY < defender.playerY + defender.height){
+        console.log('y');
+        //not working, figure it out silly billy
+        if (defender.lastHit < millis() - 1000){
+          defender.currentlyHit = true;
+          defender.lastHit = millis();
         }
       }
       else{
-        // console.log('i')
-
+        console.log('n');
       }
-    
+    }
   }
-
 }
 
 
