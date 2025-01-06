@@ -67,6 +67,7 @@ class Player{
     this.legY = 0;
     this.currentlyKicking = false;
     this.kickBalls = 0;
+    this.character;
 
     
   }
@@ -259,6 +260,7 @@ class Player{
     }
   }
   //all current possible player inputs
+  //add a 'special' move thing that looks at this.character and send it to a corresponding function, ie special move 1,2,3 ect
   playerInputs(player){
     if (!this.currentlyAttacking && !this.currentlyKicking){      
       //lets the code swap what keys its looking for
@@ -356,6 +358,7 @@ let characterSelectBoxX;
 let characterSelectBoxY = 250;
 let characterSelectBoxSideLength = 100;
 let mouseHoveringOver = 'none';
+let currentPlayerSelection = 1;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -378,7 +381,7 @@ function draw() {
 
   }
 
-  else if (gameMode === x){
+  else if (gameMode === "playing"){
     
   }
 
@@ -415,15 +418,27 @@ function draw() {
 }
 
 function mousePressed(){
-  john.health -= 10;
-  if (mouseHoveringOver === "1"){
-    
-
+  // john.health -= 10;
+  if(currentPlayerSelection === 1){
+    if (mouseHoveringOver === "1"){
+      john.character = "james"
+      
+  
+    }
+    else if(mouseHoveringOver === "2"){
+      john.character = "jimmy"
+  
+    }
   }
-  else if(mouseHoveringOver === "2"){
-
+  else{
+    if (mouseHoveringOver === "1"){
+      jim.character = "james"
+    }
+    else if(mouseHoveringOver === "2"){
+      jim.character = "jimmy"
+  
+    }
   }
-  else{}
 }
 
 function characterSelect(){
@@ -478,6 +493,6 @@ function playerIsHit(attacker,defender){
       }
     }
   }
-}
+
 
 
