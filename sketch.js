@@ -8,7 +8,10 @@
 // Extra for Experts:
 // N.A.
 // CURRENT TO DO LIST IN ORDER OF PRIORITY:
+//put the character input diffrences into the setup in a map to be refrenced later
 //add main menu and character select (make 3 characters with 3 unique abilitys)
+//do 2 characters and then do the full menu for 3 characters, then add the third character
+//add something to the hit reg thing that checks if its a normal attack or a special, so it has to check less stuff
 //fix gravity, I'm not a fan of how it is now
 //...
 //make actual sprites for the characters
@@ -16,8 +19,7 @@
 //THAT WAY THE HITBOXES DONT HAVE TO LOOK AWESOME
 
 //current issues:
-//
-
+//none atm
 
 class Player{
   constructor(x,y){
@@ -68,9 +70,12 @@ class Player{
     this.legY = 0;
     this.currentlyKicking = false;
     this.kickBalls = 0;
-    this.character = ''
-
-    
+    this.character = '';
+    this.specialUseTime = -2000;
+    this.special1Bullet = 0;
+    this.special2RockX = 0;
+    this.special2RockY = 0;
+    this.currentlyUsingSpecial = false;
   }
 
   //displays the players
@@ -203,8 +208,8 @@ class Player{
             translate(this.playerX + this.width/2,this.playerY + this.height/3 + this.height/3);
             rotate(this.legRotation);
             rect(0,0, 20, this.height/3);
-            pop()
-            this.kickBalls += 1
+            pop();
+            this.kickBalls += 1;
             this.legX = this.playerX + this.width + this.kickBalls;
             this.legY = this.playerY + this.height/3 + this.height/3 + this.kickBalls;
           }
@@ -247,7 +252,7 @@ class Player{
             rect(0,0, 20,this.height/3);
             pop();
             this.currentlyKicking = true;
-            this.kickBalls += 1
+            this.kickBalls += 1;
             this.legX = this.playerX + this.width/2 + this.kickBalls;
             this.legY = this.playerY + this.height/3 + this.height/3 + this.kickBalls;
           }
@@ -260,20 +265,42 @@ class Player{
       this.legRotation = 0;
     }
   }
+  //fire a projectile with a limited lifespan
+  special1(){
+    if (this.specialUseTime + 1000 > millis()){
+      rect(this.playerX + this.width/2 + this.special1Bullet,this.playerY + 40, 40,20);
+      if (this.facingRight){
+        this.special1Bullet += 2;
+        this.currentlyUsingSpecial = true;
+      }
+      else{
+        this.special1Bullet -= 2;
+        this.currentlyUsingSpecial = true;
+      }
+    }
+    else{
+      this.special1Bullet = 0;
+      this.currentlyUsingSpecial = false;
+    }
+  }
+  //throw a rock
+  special2(){
+
+  }
   //all current possible player inputs
-  //add a 'special' move thing that looks at this.character and send it to a corresponding function, ie special move 1,2,3 ect
   playerInputs(player){
-    if (!this.currentlyAttacking && !this.currentlyKicking){      
+    if (!this.currentlyAttacking && !this.currentlyKicking && !this.currentlyUsingSpecial){
       //lets the code swap what keys its looking for
       //consider putting these in their own function and calling the whole thing during setup
       if (player === 1){
-        this.jumpKey = 32;
+        this.jumpKey = 87;
         this.forwardKey = 68;
         this.backwardKey = 65;
-        this.crouchKey = 17;
+        this.crouchKey = 83;
         this.punchKey = 81;
         this.blockKey = 69;
         this.kickKey = 70;
+        this.specialKey = 54;
       }
       else{
         this.jumpKey = 38;
@@ -283,8 +310,15 @@ class Player{
         this.punchKey = 16;
         this.blockKey = 13;
         this.kickKey = 96;
+        this.specialKey = 100;
+
       }
       
+      //special key, subject to change
+      if(keyIsDown(54)){
+        this.specialUseTime = millis();
+      }
+
       //crouching
       if (keyIsDown(this.crouchKey)){
         if (this.height === 200){
@@ -312,8 +346,14 @@ class Player{
       if (keyIsDown(this.punchKey)  && (this.playerY === 400 || this.playerY === 500)){
         this.oldTime = millis();
       }
+      //blocking
       if(keyIsDown(this.blockKey) && (this.playerY === 400 || this.playerY === 500)){
-        rect(this.playerX + 40,this.playerY+20,20,this.height/2);
+        if (this.facingRight){
+          rect(this.playerX + 40,this.playerY+20,20,this.height/2);
+        }
+        else{
+          rect(this.playerX - 10 ,this.playerY+20,20,this.height/2);
+        }
         this.isBlocking = true;
       }
       else{
@@ -360,6 +400,7 @@ let characterSelectBoxY = 250;
 let characterSelectBoxSideLength = 100;
 let mouseHoveringOver = 'none';
 let currentPlayerSelection = 1;
+const map = new Map();
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -369,12 +410,23 @@ function setup() {
   jim = new Player(windowWidth - 100,400);
   jim.facingRight = false;
   characterSelectBoxX = windowWidth;
-
+  map.set('jump',87);
+  map.set("forward",68);
+  map.set("backward",65);
+  map.set("crouch",83);
   
+
+  // this.jumpKey = 87;
+  // this.forwardKey = 68;
+  // this.backwardKey = 65;
+  // this.crouchKey = 83;
+  // this.punchKey = 81;
+  // this.blockKey = 69;
+  // this.kickKey = 70;
+  // this.specialKey = 54;
 }
 
 function draw() {
-  console.log(mouseHoveringOver)
   background(220);
   //floor
 
@@ -383,7 +435,7 @@ function draw() {
   }
 
   else if (gameMode === "playing"){
-    fill('white')
+    fill('white');
     rect(0,600,width,height);
     john.healthBar(100,100);
     jim.healthBar(windowWidth - 200,100);
@@ -392,6 +444,7 @@ function draw() {
     john.display();
     john.playerInputs(1);
     john.hit();
+    john.special1();
   
     //required functions for player 2
     jim.display();
@@ -410,33 +463,30 @@ function draw() {
     john.punchX = 0;
     jim.punchX = 0;
   }
-
   else{
-
   }
-  
 }
 
 function mousePressed(){
   // john.health -= 10;
   if(currentPlayerSelection === 1){
     if (mouseHoveringOver === "1"){
-      john.character = "james"
-      currentPlayerSelection = 2
+      john.character = "josh";
+      currentPlayerSelection = 2;
     }
     else if(mouseHoveringOver === "2"){
-      john.character = "jimmy"
-      currentPlayerSelection = 2
+      john.character = "jimmy";
+      currentPlayerSelection = 2;
     }
   }
   else{
     if (mouseHoveringOver === "1"){
-      jim.character = "james"
-      gameMode = "playing"
+      jim.character = "josh";
+      gameMode = "playing";
     }
     else if(mouseHoveringOver === "2"){
-      jim.character = "jimmy"
-      gameMode = "playing"  
+      jim.character = "jimmy";
+      gameMode = "playing";  
     }
   }
 }
@@ -448,8 +498,8 @@ function characterSelect(){
   
   //changing if the first box is selected
   if (mouseX >= characterSelectBoxX/4 && mouseX <= characterSelectBoxX/4 + characterSelectBoxSideLength && mouseY >= characterSelectBoxY && mouseY <= characterSelectBoxY + characterSelectBoxSideLength){
-    fill("green");    
     mouseHoveringOver = '1';
+    fill("green");    
   }
   else{
     fill("white");
@@ -464,7 +514,9 @@ function characterSelect(){
   }
   else{
     fill("white");
-    mouseHoveringOver = 'none';
+    if (mouseHoveringOver !== "1"){
+      mouseHoveringOver = 'none';
+    }
   }
   rect(characterSelectBoxX/2,characterSelectBoxY,characterSelectBoxSideLength,characterSelectBoxSideLength);
 
@@ -477,22 +529,21 @@ function characterSelect(){
 
 //adding hit detection to the players, not player collisions
 function playerIsHit(attacker,defender){
-  if ((attacker.currentlyAttacking || attacker.currentlyKicking) && !defender.isBlocking){
-      if ((attacker.punchX > defender.playerX && attacker.punchX < defender.playerX + defender.width) || (attacker.legX  > defender.playerX && attacker.legX - attacker.width/2 < defender.playerX + defender.width)){
-        if ((attacker.punchY > defender.playerY && attacker.punchY < defender.playerY + defender.height - 40) || (attacker.legY > defender.playerY && attacker.legY < defender.playerY + defender.height)){
-          console.log('y')
-          //not working, figure it out silly billy
-          if (defender.lastHit < millis() - 1000){
-            defender.currentlyHit = true;
-            defender.lastHit = millis();
-          }
+  if ((attacker.currentlyAttacking || attacker.currentlyKicking) && (!defender.isBlocking || defender.isBlocking && !attacker.facingRight && !defender.facingRight || defender.isBlocking && attacker.facingRight && defender.facingRight)){
+    if (attacker.punchX > defender.playerX && attacker.punchX < defender.playerX + defender.width || attacker.legX  > defender.playerX && attacker.legX - attacker.width/2 < defender.playerX + defender.width){
+      if (attacker.punchY > defender.playerY && attacker.punchY < defender.playerY + defender.height - 40 || attacker.legY > defender.playerY && attacker.legY < defender.playerY + defender.height){
+        console.log('y');
+        if (defender.lastHit < millis() - 1000 ){
+          defender.currentlyHit = true;
+          defender.lastHit = millis();
         }
-        else{
-          console.log('n')
-        }
+      }
+      else{
+        console.log('n');
       }
     }
   }
+}
 
 
 
