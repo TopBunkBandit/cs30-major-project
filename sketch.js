@@ -8,7 +8,6 @@
 // Extra for Experts:
 // N.A.
 // CURRENT TO DO LIST IN ORDER OF PRIORITY:
-//put the character input diffrences into the setup in a map to be refrenced later
 //add main menu and character select (make 3 characters with 3 unique abilitys)
 //do 2 characters and then do the full menu for 3 characters, then add the third character
 //add something to the hit reg thing that checks if its a normal attack or a special, so it has to check less stuff
@@ -394,7 +393,7 @@ class Player{
 }
 
 let lastHit = 0;
-let gameMode = "character selection";
+let gameMode = "start screen";
 let characterSelectBoxX;
 let characterSelectBoxY = 250;
 let characterSelectBoxSideLength = 100;
@@ -410,27 +409,18 @@ function setup() {
   jim = new Player(windowWidth - 100,400);
   jim.facingRight = false;
   characterSelectBoxX = windowWidth;
-  map.set('jump',87);
-  map.set("forward",68);
-  map.set("backward",65);
-  map.set("crouch",83);
-  
 
-  // this.jumpKey = 87;
-  // this.forwardKey = 68;
-  // this.backwardKey = 65;
-  // this.crouchKey = 83;
-  // this.punchKey = 81;
-  // this.blockKey = 69;
-  // this.kickKey = 70;
-  // this.specialKey = 54;
 }
 
 function draw() {
   background(220);
   //floor
 
-  if (gameMode === "character selection"){
+  if(gameMode === "start screen"){
+    mainMenu();
+
+  }
+  else if (gameMode === "character selection"){
     characterSelect();
   }
 
@@ -469,6 +459,9 @@ function draw() {
 
 function mousePressed(){
   // john.health -= 10;
+  if (mouseHoveringOver === "start"){
+    gameMode = "character selection"
+  }
   if(currentPlayerSelection === 1){
     if (mouseHoveringOver === "1"){
       john.character = "josh";
@@ -489,6 +482,26 @@ function mousePressed(){
       gameMode = "playing";  
     }
   }
+}
+
+function mainMenu(){
+  rectMode(CENTER)
+  if(mouseX > width/2 - 200 && mouseX < width/2 + 200 && mouseY > height/4 - 25 && mouseY < height/4 +25){
+    fill("white")
+    rect(width/2,height/4,400,50)
+    fill("black")
+    mouseHoveringOver = "start"
+  }
+  else{
+    fill("black")
+    rect(width/2,height/4,400,50)
+    fill("white")
+    mouseHoveringOver = "none"
+
+  }
+  textSize(15)
+  text("Start Game",width/2 - 40,height/4 + 5)
+  rectMode(CORNER)
 }
 
 function characterSelect(){
