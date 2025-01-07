@@ -8,14 +8,15 @@
 // Extra for Experts:
 // N.A.
 // CURRENT TO DO LIST IN ORDER OF PRIORITY:
-//add main menu and character select 
+//add main menu and character select (make 3 characters with 3 unique abilitys)
 //fix gravity, I'm not a fan of how it is now
 //...
 //make actual sprites for the characters
 //GREAT IDEA, PUT SPRITES OVER THE CURRENT THINGS AND KEEP THEM AS HITBOXES
 //THAT WAY THE HITBOXES DONT HAVE TO LOOK AWESOME
 
-
+//current issues:
+//
 
 
 class Player{
@@ -67,7 +68,7 @@ class Player{
     this.legY = 0;
     this.currentlyKicking = false;
     this.kickBalls = 0;
-    this.character;
+    this.character = ''
 
     
   }
@@ -373,47 +374,46 @@ function setup() {
 }
 
 function draw() {
+  console.log(mouseHoveringOver)
   background(220);
   //floor
 
   if (gameMode === "character selection"){
     characterSelect();
-
   }
 
   else if (gameMode === "playing"){
+    fill('white')
+    rect(0,600,width,height);
+    john.healthBar(100,100);
+    jim.healthBar(windowWidth - 200,100);
+  
+    //required functions for player 1
+    john.display();
+    john.playerInputs(1);
+    john.hit();
+  
+    //required functions for player 2
+    jim.display();
+    jim.playerInputs(2);
+    jim.hit();
     
+    //attacking
+    john.punch();
+    jim.punch();
+  
+    john.kick();
+    jim.kick();
+  
+    playerIsHit(john,jim);
+    playerIsHit(jim,john);
+    john.punchX = 0;
+    jim.punchX = 0;
   }
 
   else{
 
   }
-  fill('white')
-  rect(0,600,width,height);
-  john.healthBar(100,100);
-  jim.healthBar(windowWidth - 200,100);
-
-  //required functions for player 1
-  john.display();
-  john.playerInputs(1);
-  john.hit();
-
-  //required functions for player 2
-  jim.display();
-  jim.playerInputs(2);
-  jim.hit();
-  
-  //attacking
-  john.punch();
-  jim.punch();
-
-  john.kick();
-  jim.kick();
-
-  playerIsHit(john,jim);
-  playerIsHit(jim,john);
-  john.punchX = 0;
-  jim.punchX = 0;
   
 }
 
@@ -422,21 +422,21 @@ function mousePressed(){
   if(currentPlayerSelection === 1){
     if (mouseHoveringOver === "1"){
       john.character = "james"
-      
-  
+      currentPlayerSelection = 2
     }
     else if(mouseHoveringOver === "2"){
       john.character = "jimmy"
-  
+      currentPlayerSelection = 2
     }
   }
   else{
     if (mouseHoveringOver === "1"){
       jim.character = "james"
+      gameMode = "playing"
     }
     else if(mouseHoveringOver === "2"){
       jim.character = "jimmy"
-  
+      gameMode = "playing"  
     }
   }
 }
