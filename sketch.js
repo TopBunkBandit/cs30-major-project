@@ -470,6 +470,9 @@ function mousePressed(){
   else if(mouseHoveringOver === "controls"){
     gameMode = "controls";
   }
+  else if (mouseHoveringOver === "main menu"){
+    gameMode = "start screen"
+  }
   if(currentPlayerSelection === 1){
     if (mouseHoveringOver === "1"){
       john.character = "josh";
@@ -531,19 +534,19 @@ function displayControls(){
   textSize(20)
   for(let x = 0; x < controlArray.length; x++){
     fill("orange");
-    text(controlArray[x],width/5, y + height/3);
+    text(controlArray[x],width/4 - 20, y + height/3);
     y += 20;
   }
   y = 0;
   for (let x = 0; x < playerInputsArray1.length; x++){
     fill("orange");
-    text(playerInputsArray1[x],width/2.7,y+height/3)
+    text(playerInputsArray1[x],width/3 - 20,y+height/3)
     y += 20;
   }
   y = 0;
   for (let x = 0; x < playerInputsArray1.length; x++){
     fill("orange");
-    text(playerInputsArray2[x],width/1.9,y+height/3);
+    text(playerInputsArray2[x],width/3 + 100,y+height/3);
     y += 20;
   }
   y = 0;
