@@ -302,14 +302,14 @@ class Player{
         this.specialKey = 54;
       }
       else{
-        this.jumpKey = 38;
-        this.forwardKey = 39;
-        this.backwardKey = 37;
-        this.crouchKey = 40;
-        this.punchKey = 16;
-        this.blockKey = 13;
-        this.kickKey = 96;
-        this.specialKey = 100;
+        this.jumpKey = 101;
+        this.forwardKey = 99;
+        this.backwardKey = 97;
+        this.crouchKey = 98;
+        this.punchKey = 100;
+        this.blockKey = 102;
+        this.kickKey = 103;
+        this.specialKey = 105;
 
       }
       
@@ -392,6 +392,7 @@ class Player{
   }
 }
 
+let y = 0;
 let lastHit = 0;
 let gameMode = "start screen";
 let characterSelectBoxX;
@@ -399,8 +400,10 @@ let characterSelectBoxY = 250;
 let characterSelectBoxSideLength = 100;
 let mouseHoveringOver = 'none';
 let currentPlayerSelection = 1;
-const map = new Map();
-
+const TEXT_SPACING = 100;
+let controlArray = ["CONTROLS:","RIGHT","LEFT","CROUCH","JUMP","PUNCH","KICK","BLOCK","SPECIAL",];
+let playerInputsArray1 = ["PLAYER 1:","D","A","S","W","Q","F","E","6"];
+let playerInputsArray2 = ["PLAYER 2:","1 ON NUMPAD","3 ON NUMPAD","2 ON NUMPAD","5 ON NUMPAD","4 ON NUMPAD","7 ON NUMPAD","6 ON NUMPAD","9 ON NUMPAD",];
 function setup() {
   createCanvas(windowWidth, windowHeight);
   angleMode(DEGREES);
@@ -418,7 +421,9 @@ function draw() {
 
   if(gameMode === "start screen"){
     mainMenu();
-
+  }
+  else if(gameMode === "controls"){
+    displayControls();
   }
   else if (gameMode === "character selection"){
     characterSelect();
@@ -460,7 +465,10 @@ function draw() {
 function mousePressed(){
   // john.health -= 10;
   if (mouseHoveringOver === "start"){
-    gameMode = "character selection"
+    gameMode = "character selection";
+  }
+  else if(mouseHoveringOver === "controls"){
+    gameMode = "controls";
   }
   if(currentPlayerSelection === 1){
     if (mouseHoveringOver === "1"){
@@ -485,24 +493,80 @@ function mousePressed(){
 }
 
 function mainMenu(){
-  rectMode(CENTER)
+  rectMode(CENTER);
   if(mouseX > width/2 - 200 && mouseX < width/2 + 200 && mouseY > height/4 - 25 && mouseY < height/4 +25){
-    fill("white")
-    rect(width/2,height/4,400,50)
-    fill("black")
-    mouseHoveringOver = "start"
+    fill("white");
+    rect(width/2,height/4,400,50);
+    fill("black");
+    mouseHoveringOver = "start";
   }
   else{
-    fill("black")
-    rect(width/2,height/4,400,50)
-    fill("white")
-    mouseHoveringOver = "none"
-
+    fill("black");
+    rect(width/2,height/4,400,50);
+    fill("white");
+    mouseHoveringOver = "none";
   }
-  textSize(15)
-  text("Start Game",width/2 - 40,height/4 + 5)
-  rectMode(CORNER)
+  textSize(15);
+  text("Start Game",width/2 - 40,height/4 + 5);
+  
+  if (mouseX > width/2 - 200 && mouseX < width/2 + 200 && mouseY > height/2.5 - 25 && mouseY < height/2.5 +25){
+    fill("white");
+    rect(width/2,height/2.5,400,50);
+    fill("black");
+    mouseHoveringOver = "controls";
+  }
+  else{
+    fill("black");
+    rect(width/2,height/2.5,400,50);
+    fill("white");
+  }
+
+  text("Controls", width/2 - 30, height/2.5 + 5);
+  rectMode(CORNER);
+
 }
+
+function displayControls(){
+  background(0,100,255);
+  textSize(20)
+  for(let x = 0; x < controlArray.length; x++){
+    fill("orange");
+    text(controlArray[x],width/5, y + height/3);
+    y += 20;
+  }
+  y = 0;
+  for (let x = 0; x < playerInputsArray1.length; x++){
+    fill("orange");
+    text(playerInputsArray1[x],width/2.7,y+height/3)
+    y += 20;
+  }
+  y = 0;
+  for (let x = 0; x < playerInputsArray1.length; x++){
+    fill("orange");
+    text(playerInputsArray2[x],width/1.9,y+height/3);
+    y += 20;
+  }
+  y = 0;
+  if (mouseX > width/2 - 150 && mouseX < width/2 + 150 && mouseY > height - 20 - height/3 && mouseY < 20 + height - height/3){
+    rectMode(CENTER);
+    fill("white");
+    rect(width/2,height - height/3,300,40);
+    fill("black");
+    rectMode(CORNER);
+    text("return",width/2.1,5 + height - height/3);
+    mouseHoveringOver = "main menu";
+  }
+  else{
+    rectMode(CENTER);
+    fill("black");
+    rect(width/2,height - height/3,300,40);
+    fill("white");
+    rectMode(CORNER);
+    text("return",width/2.1,5 + height - height/3); 
+    mouseHoveringOver = "none";
+  }
+}
+
 
 function characterSelect(){
   background("grey");
