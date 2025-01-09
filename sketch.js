@@ -8,9 +8,11 @@
 // Extra for Experts:
 // N.A.
 // CURRENT TO DO LIST IN ORDER OF PRIORITY:
-//add main menu and character select (make 3 characters with 3 unique abilitys)
-//do 2 characters and then do the full menu for 3 characters, then add the third character
+//unite the attack position varaibles so it only has to check 1
+//NEED TO WORK ON A WAY TO COMPONSATE FOR THE LEG BEING TOO LOW
 //add something to the hit reg thing that checks if its a normal attack or a special, so it has to check less stuff
+//LOOK TO THE - 40 AND GO FROM THERE IN THE HIT DETECTION, ITS THE ONLY EASILY VISABLE DIFFRENCE
+//add a way to change the special move depending on the character
 //fix gravity, I'm not a fan of how it is now
 //...
 //make actual sprites for the characters
@@ -18,7 +20,7 @@
 //THAT WAY THE HITBOXES DONT HAVE TO LOOK AWESOME
 
 //current issues:
-//none atm
+//IM GOING INSANE
 
 class Player{
   constructor(x,y){
@@ -119,7 +121,7 @@ class Player{
   }
   //the code for when punch is called in playerInputs
   punch(){
-    
+
     if (millis() < this.oldTime + 750 && (this.playerY === 400 || this.playerY === 500)){
       //forward punch
       if (this.facingRight){
@@ -262,6 +264,8 @@ class Player{
       this.currentlyKicking = false;
       this.legDown = false;
       this.legRotation = 0;
+      this.legX = 0;
+      this.legY = 0;
     }
   }
   //fire a projectile with a limited lifespan
@@ -282,6 +286,7 @@ class Player{
       this.currentlyUsingSpecial = false;
     }
   }
+
   //throw a rock
   special2(){
 
@@ -471,7 +476,7 @@ function mousePressed(){
     gameMode = "controls";
   }
   else if (mouseHoveringOver === "main menu"){
-    gameMode = "start screen"
+    gameMode = "start screen";
   }
   if(currentPlayerSelection === 1){
     if (mouseHoveringOver === "1"){
@@ -482,6 +487,10 @@ function mousePressed(){
       john.character = "jimmy";
       currentPlayerSelection = 2;
     }
+    else if(mouseHoveringOver === "3"){
+      john.character = "jack";
+      currentPlayerSelection = 2;
+    }
   }
   else{
     if (mouseHoveringOver === "1"){
@@ -490,6 +499,10 @@ function mousePressed(){
     }
     else if(mouseHoveringOver === "2"){
       jim.character = "jimmy";
+      gameMode = "playing";  
+    }
+    else if(mouseHoveringOver === "3"){
+      jim.character = "jack";
       gameMode = "playing";  
     }
   }
@@ -531,22 +544,22 @@ function mainMenu(){
 
 function displayControls(){
   background(0,100,255);
-  textSize(20)
+  textSize(20);
   for(let x = 0; x < controlArray.length; x++){
     fill("orange");
-    text(controlArray[x],width/4 - 20, y + height/3);
+    text(controlArray[x],width/3 - 20, y + height/3);
     y += 20;
   }
   y = 0;
   for (let x = 0; x < playerInputsArray1.length; x++){
     fill("orange");
-    text(playerInputsArray1[x],width/3 - 20,y+height/3)
+    text(playerInputsArray1[x],width/2 ,y+height/3);
     y += 20;
   }
   y = 0;
   for (let x = 0; x < playerInputsArray1.length; x++){
     fill("orange");
-    text(playerInputsArray2[x],width/3 + 100,y+height/3);
+    text(playerInputsArray2[x],width/3 + width/3,y+height/3);
     y += 20;
   }
   y = 0;
@@ -575,9 +588,10 @@ function characterSelect(){
   background("grey");
   
   fill("black");
+  rectMode(CENTER);
   
   //changing if the first box is selected
-  if (mouseX >= characterSelectBoxX/4 && mouseX <= characterSelectBoxX/4 + characterSelectBoxSideLength && mouseY >= characterSelectBoxY && mouseY <= characterSelectBoxY + characterSelectBoxSideLength){
+  if (mouseX >= characterSelectBoxX/4 - characterSelectBoxSideLength/2 && mouseX <= characterSelectBoxX/4 + characterSelectBoxSideLength/2 && mouseY >= characterSelectBoxY - characterSelectBoxSideLength/2  && mouseY <= characterSelectBoxY + characterSelectBoxSideLength/2){
     mouseHoveringOver = '1';
     fill("green");    
   }
@@ -588,7 +602,7 @@ function characterSelect(){
   rect(characterSelectBoxX/4,characterSelectBoxY,characterSelectBoxSideLength,characterSelectBoxSideLength);
   
   //same code but for the second box
-  if (mouseX >= characterSelectBoxX/2 && mouseX <= characterSelectBoxX/2 + characterSelectBoxSideLength && mouseY >= characterSelectBoxY && mouseY <= characterSelectBoxY + characterSelectBoxSideLength){
+  if (mouseX >= characterSelectBoxX/2 - characterSelectBoxSideLength/2  && mouseX <= characterSelectBoxX/2 + characterSelectBoxSideLength/2 && mouseY >= characterSelectBoxY - characterSelectBoxSideLength/2 && mouseY <= characterSelectBoxY + characterSelectBoxSideLength/2){
     fill("green");    
     mouseHoveringOver = '2';
   }
@@ -600,10 +614,24 @@ function characterSelect(){
   }
   rect(characterSelectBoxX/2,characterSelectBoxY,characterSelectBoxSideLength,characterSelectBoxSideLength);
 
+  if (mouseX >= characterSelectBoxX/2 + characterSelectBoxX/4 - characterSelectBoxSideLength/2 && mouseX <= characterSelectBoxX/2 + characterSelectBoxX/4 + characterSelectBoxSideLength/2 && mouseY >= characterSelectBoxY - characterSelectBoxSideLength/2 && mouseY <= characterSelectBoxY + characterSelectBoxSideLength/2){
+    fill("green");    
+    mouseHoveringOver = '3';
+  }
+  else{
+    fill("white");
+    if (mouseHoveringOver !== "1" && mouseHoveringOver !== "2"){
+      mouseHoveringOver = 'none';
+    }
+  }
+  rect(characterSelectBoxX/2 + characterSelectBoxX/4,characterSelectBoxY,characterSelectBoxSideLength,characterSelectBoxSideLength);
+
   //text for which character is which
   fill("white");  
-  text("Character A",characterSelectBoxX/4,characterSelectBoxY - 50);
-  text("Character B",characterSelectBoxX/2, characterSelectBoxY - 50);
+  text("Josh",characterSelectBoxX/5 + 40,characterSelectBoxY - 60);
+  text("Jimmy",characterSelectBoxX/2 - 20, characterSelectBoxY - 60);
+  text("Jack",characterSelectBoxX/2 + characterSelectBoxX/4 - 20, characterSelectBoxY - 60);
+  rectMode(CORNER);
 }
 
 
