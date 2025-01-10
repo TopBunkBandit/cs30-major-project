@@ -1,26 +1,26 @@
 // 2D ARCADE FIGHTING GAME
-// THIS GAME WILL NOT BE AS GOOD AS INTENDED UNTIL LATER, 
-// DONT EXPECT A GOOD GAME YET MR. PERSON READING THIS
-// ALSO THE COMMENTS ARE DEV NOTES, THEY ARE FOR HELPING ME NOT THE READER
+// THE COMMENTS ARE DEV NOTES, THEY ARE FOR HELPING ME NOT THE READER
 // James Mitchell
 // 11/20/24
 //
 // Extra for Experts:
 // N.A.
 // CURRENT TO DO LIST IN ORDER OF PRIORITY:
-//unite the attack position varaibles so it only has to check 1
-//NEED TO WORK ON A WAY TO COMPONSATE FOR THE LEG BEING TOO LOW
 //add something to the hit reg thing that checks if its a normal attack or a special, so it has to check less stuff
-//LOOK TO THE - 40 AND GO FROM THERE IN THE HIT DETECTION, ITS THE ONLY EASILY VISABLE DIFFRENCE
+//add diffrent looks for characters
 //add a way to change the special move depending on the character
+//GET AROUND TO ADDING COLLISIONS TO THE SPECIAL ATTACK YOU FOOL
+//BETA TESTS AFTER THATS DONE, DONT DO MORE UNTIL THEN
 //fix gravity, I'm not a fan of how it is now
 //...
 //make actual sprites for the characters
+//NOT A GREAT IDEA ITS GONNA TAKE TOO LONG
 //GREAT IDEA, PUT SPRITES OVER THE CURRENT THINGS AND KEEP THEM AS HITBOXES
 //THAT WAY THE HITBOXES DONT HAVE TO LOOK AWESOME
 
 //current issues:
 //IM GOING INSANE
+//SOMETHING IS WORKING LETS GOOOOOO!!!!!!!
 
 class Player{
   constructor(x,y){
@@ -84,11 +84,59 @@ class Player{
     fill("white");
     rect(this.playerX,this.playerY,this.width,this.height);
     fill("black");
+    
     if (this.facingRight){
-      circle(this.playerX + this.width, this.playerY + 20, 10);     
+      circle(this.playerX + this.width, this.playerY + 20, 10);   
+      if (this.character === "josh"){
+        rectMode(CENTER);
+        rect(this.playerX + this.width/2,this.playerY - 15, 50,30);
+        rect(this.playerX + this.width/2,this.playerY - 5, 70,10);
+        rectMode(CORNER);
+      }
+      else if(this.character === "jimmy"){
+        fill("grey");
+        rect(this.playerX + this.width -5 ,this.playerY + 40,10,10);
+        rect(this.playerX,this.playerY + 40,this.width,this.height - 40);
+      }
+      else{
+        fill("grey");
+        circle(this.playerX + this.width, this.playerY + 20, 10);  
+        //nose
+        triangle(this.playerX + this.width, this.playerY + 30, this.playerX + this.width, this.playerY + 40, this.playerX + this.width + 5, this.playerY + 40);
+        push();
+        noStroke();
+        //rework these so it doesnt show on the players rectangle
+        rect(this.playerX + this.width -7.5 ,this.playerY + 40,15,40);
+        triangle(this.playerX + this.width - 10, this.playerY + 80, this.playerX + this.width + 10, this.playerY + 80, this.playerX + this.width, this.playerY + 90);
+        pop();
+      }
     }
     else{
       circle(this.playerX, this.playerY + 20, 10);
+
+      //rework this for facing left
+      // if (this.character === "josh"){
+      //   rectMode(CENTER);
+      //   rect(this.playerX + this.width/2,this.playerY - 15, 50,30);
+      //   rect(this.playerX + this.width/2,this.playerY - 5, 70,10);
+      //   rectMode(CORNER);
+      // }
+      // else if(this.character === "jimmy"){
+      //   fill("grey");
+      //   rect(this.playerX + this.width -5 ,this.playerY + 40,10,10);
+      //   rect(this.playerX,this.playerY + 40,this.width,this.height - 40);
+      // }
+      // else{
+      //   fill("grey");
+      //   circle(this.playerX + this.width, this.playerY + 20, 10);  
+      //   push();
+      //   noStroke();
+      //   rect(this.playerX + this.width -10 ,this.playerY + 40,20,40);
+      //   triangle(this.playerX + this.width - 10, this.playerY + 80, this.playerX + this.width + 10, this.playerY + 80, this.playerX + this.width, this.playerY + 90)
+      //   pop();
+      // }
+
+
     }
     fill("white");
   }
@@ -121,8 +169,8 @@ class Player{
   }
   //the code for when punch is called in playerInputs
   punch(){
-
     if (millis() < this.oldTime + 750 && (this.playerY === 400 || this.playerY === 500)){
+      kickFactor = 0;
       //forward punch
       if (this.facingRight){
         if (millis() < this.oldTime + 750/2){
@@ -199,8 +247,10 @@ class Player{
   kick(){
     if (this.kickTime > millis() - 1290){
       if (this.playerY === 400 || this.playerY === 500){
-        //forward punch
+        //forward kick
+        console.log(kickFactor);
         if (this.facingRight){
+          kickFactor = -15;
           if (this.legRotation > -75 && !this.legDown){
             this.legRotation -= 2;
             this.currentlyKicking = true;
@@ -211,8 +261,8 @@ class Player{
             rect(0,0, 20, this.height/3);
             pop();
             this.kickBalls += 1;
-            this.legX = this.playerX + this.width + this.kickBalls;
-            this.legY = this.playerY + this.height/3 + this.height/3 + this.kickBalls;
+            this.punchX = this.playerX + this.width + this.kickBalls;
+            this.punchY = this.playerY + this.height/3 + this.height/3 + this.kickBalls;
           }
           else{
             this.legDown = true;
@@ -225,11 +275,12 @@ class Player{
             pop();
             this.currentlyKicking = true;
             this.kickBalls -= 1;
-            this.legX = this.playerX + this.width + this.kickBalls;
-            this.legY = this.playerY + this.height/3 + this.height/3 + this.kickBalls;
+            this.punchX = this.playerX + this.width + this.kickBalls;
+            this.punchY = this.playerY + this.height/3 + this.height/3 + this.kickBalls;
           }
         }
         else{
+          kickFactor = 30;
           if (this.legRotation < 75 && !this.legDown){
             this.legRotation += 2;
             this.currentlyKicking = true;
@@ -241,8 +292,8 @@ class Player{
             rect(0,0, 20, this.height/3);
             pop();
             this.kickBalls -= 1;
-            this.legX = this.playerX + this.width/2  + this.kickBalls;
-            this.legY = this.playerY + this.height/3 + this.height/3 - this.kickBalls;
+            this.punchX = this.playerX + this.width/2  + this.kickBalls;
+            this.punchY = this.playerY + this.height/3 + this.height/3 - this.kickBalls;
           }
           else{
             this.legDown = true;
@@ -254,8 +305,8 @@ class Player{
             pop();
             this.currentlyKicking = true;
             this.kickBalls += 1;
-            this.legX = this.playerX + this.width/2 + this.kickBalls;
-            this.legY = this.playerY + this.height/3 + this.height/3 + this.kickBalls;
+            this.punchX = this.playerX + this.width/2 + this.kickBalls;
+            this.punchY = this.playerY + this.height/3 + this.height/3 + this.kickBalls;
           }
         }
       }
@@ -264,8 +315,8 @@ class Player{
       this.currentlyKicking = false;
       this.legDown = false;
       this.legRotation = 0;
-      this.legX = 0;
-      this.legY = 0;
+      // this.punchX = 0;
+      this.punchY -= 2;
     }
   }
   //fire a projectile with a limited lifespan
@@ -397,6 +448,7 @@ class Player{
   }
 }
 
+let kickFactor = 0;
 let y = 0;
 let lastHit = 0;
 let gameMode = "start screen";
@@ -409,6 +461,7 @@ const TEXT_SPACING = 100;
 let controlArray = ["CONTROLS:","RIGHT","LEFT","CROUCH","JUMP","PUNCH","KICK","BLOCK","SPECIAL",];
 let playerInputsArray1 = ["PLAYER 1:","D","A","S","W","Q","F","E","6"];
 let playerInputsArray2 = ["PLAYER 2:","1 ON NUMPAD","3 ON NUMPAD","2 ON NUMPAD","5 ON NUMPAD","4 ON NUMPAD","7 ON NUMPAD","6 ON NUMPAD","9 ON NUMPAD",];
+let winner = "";
 function setup() {
   createCanvas(windowWidth, windowHeight);
   angleMode(DEGREES);
@@ -435,6 +488,7 @@ function draw() {
   }
 
   else if (gameMode === "playing"){
+    
     fill('white');
     rect(0,600,width,height);
     john.healthBar(100,100);
@@ -451,60 +505,85 @@ function draw() {
     jim.playerInputs(2);
     jim.hit();
     
+    john.kick();
+    jim.kick();
     //attacking
     john.punch();
     jim.punch();
   
-    john.kick();
-    jim.kick();
   
     playerIsHit(john,jim);
     playerIsHit(jim,john);
     john.punchX = 0;
     jim.punchX = 0;
+    if (john.health <= 0){
+      winner = "jim";
+      gameMode ="end";
+    }
+    else if (jim.health <=0){
+      gameMode = "end";
+      winner = "john";
+    }
   }
-  else{
+  else if (gameMode === "end"){
+    if (winner === "jim"){
+      background("grey");
+      text("player 2 wins!", width/2, height/2 - 20);
+    }
+    else{
+      background('grey');
+      text("player 1 wins!", width/2, height/2 - 20);
+    }
   }
 }
 
 function mousePressed(){
   // john.health -= 10;
-  if (mouseHoveringOver === "start"){
-    gameMode = "character selection";
-  }
-  else if(mouseHoveringOver === "controls"){
-    gameMode = "controls";
-  }
-  else if (mouseHoveringOver === "main menu"){
-    gameMode = "start screen";
-  }
-  if(currentPlayerSelection === 1){
-    if (mouseHoveringOver === "1"){
-      john.character = "josh";
-      currentPlayerSelection = 2;
+  if (gameMode !== "end"){
+
+    if (mouseHoveringOver === "start"){
+      gameMode = "character selection";
     }
-    else if(mouseHoveringOver === "2"){
-      john.character = "jimmy";
-      currentPlayerSelection = 2;
+    else if(mouseHoveringOver === "controls"){
+      gameMode = "controls";
     }
-    else if(mouseHoveringOver === "3"){
-      john.character = "jack";
-      currentPlayerSelection = 2;
+    else if (mouseHoveringOver === "main menu"){
+      gameMode = "start screen";
+    }
+    if(currentPlayerSelection === 1){
+      if (mouseHoveringOver === "1"){
+        john.character = "josh";
+        currentPlayerSelection = 2;
+      }
+      else if(mouseHoveringOver === "2"){
+        john.character = "jimmy";
+        currentPlayerSelection = 2;
+      }
+      else if(mouseHoveringOver === "3"){
+        john.character = "jack";
+        currentPlayerSelection = 2;
+      }
+    }
+    else{
+      if (mouseHoveringOver === "1"){
+        jim.character = "josh";
+        gameMode = "playing";
+      }
+      else if(mouseHoveringOver === "2"){
+        jim.character = "jimmy";
+        gameMode = "playing";  
+      }
+      else if(mouseHoveringOver === "3"){
+        jim.character = "jack";
+        gameMode = "playing";  
+      }
     }
   }
   else{
-    if (mouseHoveringOver === "1"){
-      jim.character = "josh";
-      gameMode = "playing";
-    }
-    else if(mouseHoveringOver === "2"){
-      jim.character = "jimmy";
-      gameMode = "playing";  
-    }
-    else if(mouseHoveringOver === "3"){
-      jim.character = "jack";
-      gameMode = "playing";  
-    }
+    gameMode = "start screen";
+    john.health = 100;
+    jim.health = 100;
+
   }
 }
 
@@ -636,12 +715,18 @@ function characterSelect(){
 
 
 //adding hit detection to the players, not player collisions
+
+
 function playerIsHit(attacker,defender){
   if ((attacker.currentlyAttacking || attacker.currentlyKicking) && (!defender.isBlocking || defender.isBlocking && !attacker.facingRight && !defender.facingRight || defender.isBlocking && attacker.facingRight && defender.facingRight)){
-    if (attacker.punchX > defender.playerX && attacker.punchX < defender.playerX + defender.width || attacker.legX  > defender.playerX && attacker.legX - attacker.width/2 < defender.playerX + defender.width){
-      if (attacker.punchY > defender.playerY && attacker.punchY < defender.playerY + defender.height - 40 || attacker.legY > defender.playerY && attacker.legY < defender.playerY + defender.height){
+    if (attacker.punchX > defender.playerX + kickFactor && attacker.punchX < defender.playerX + defender.width + kickFactor){
+      if (attacker.punchY > defender.playerY && attacker.punchY < defender.playerY + defender.height){
         console.log('y');
-        if (defender.lastHit < millis() - 1000 ){
+        if (defender.lastHit < millis() - 750 && attacker.currentlyAttacking){
+          defender.currentlyHit = true;
+          defender.lastHit = millis();
+        }
+        else if(defender.lastHit < millis() - 1250 && attacker.currentlyKicking){
           defender.currentlyHit = true;
           defender.lastHit = millis();
         }
@@ -652,6 +737,3 @@ function playerIsHit(attacker,defender){
     }
   }
 }
-
-
-
