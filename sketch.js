@@ -102,12 +102,12 @@ class Player{
         fill("grey");
         circle(this.playerX + this.width, this.playerY + 20, 10);  
         //nose
-        triangle(this.playerX + this.width, this.playerY + 30, this.playerX + this.width, this.playerY + 40, this.playerX + this.width + 5, this.playerY + 40);
+        // triangle(this.playerX + this.width, this.playerY + 30, this.playerX + this.width, this.playerY + 40, this.playerX + this.width + 5, this.playerY + 40);
         push();
         noStroke();
         //rework these so it doesnt show on the players rectangle
-        rect(this.playerX + this.width -7.5 ,this.playerY + 40,15,40);
-        triangle(this.playerX + this.width - 10, this.playerY + 80, this.playerX + this.width + 10, this.playerY + 80, this.playerX + this.width, this.playerY + 90);
+        rect(this.playerX + this.width ,this.playerY + 40,5,20);
+        triangle(this.playerX + this.width, this.playerY + 60, this.playerX + this.width + 5, this.playerY + 60, this.playerX + this.width, this.playerY + 90);
         pop();
       }
     }
@@ -115,26 +115,29 @@ class Player{
       circle(this.playerX, this.playerY + 20, 10);
 
       //rework this for facing left
-      // if (this.character === "josh"){
-      //   rectMode(CENTER);
-      //   rect(this.playerX + this.width/2,this.playerY - 15, 50,30);
-      //   rect(this.playerX + this.width/2,this.playerY - 5, 70,10);
-      //   rectMode(CORNER);
-      // }
-      // else if(this.character === "jimmy"){
-      //   fill("grey");
-      //   rect(this.playerX + this.width -5 ,this.playerY + 40,10,10);
-      //   rect(this.playerX,this.playerY + 40,this.width,this.height - 40);
-      // }
-      // else{
-      //   fill("grey");
-      //   circle(this.playerX + this.width, this.playerY + 20, 10);  
-      //   push();
-      //   noStroke();
-      //   rect(this.playerX + this.width -10 ,this.playerY + 40,20,40);
-      //   triangle(this.playerX + this.width - 10, this.playerY + 80, this.playerX + this.width + 10, this.playerY + 80, this.playerX + this.width, this.playerY + 90)
-      //   pop();
-      // }
+      if (this.character === "josh"){
+        rectMode(CENTER);
+        rect(this.playerX + this.width/2,this.playerY - 15, 50,30);
+        rect(this.playerX + this.width/2,this.playerY - 5, 70,10);
+        rectMode(CORNER);
+      }
+      else if(this.character === "jimmy"){
+        fill("grey");
+        rect(this.playerX - 5 ,this.playerY + 40,10,10);
+        rect(this.playerX,this.playerY + 40,this.width,this.height - 40);
+      }
+      else{
+        fill("grey");
+        circle(this.playerX, this.playerY + 20, 10);  
+        //nose
+        // triangle(this.playerX + this.width, this.playerY + 30, this.playerX + this.width, this.playerY + 40, this.playerX + this.width + 5, this.playerY + 40);
+        push();
+        noStroke();
+        //rework these so it doesnt show on the players rectangle
+        rect(this.playerX - 5 ,this.playerY + 40,5,20);
+        triangle(this.playerX, this.playerY + 60, this.playerX - 5, this.playerY + 60, this.playerX , this.playerY + 90);
+        pop();
+      }
 
 
     }
@@ -326,15 +329,21 @@ class Player{
       if (this.facingRight){
         this.special1Bullet += 2;
         this.currentlyUsingSpecial = true;
+        this.punchX = this.special1Bullet + this.playerX + 3*this.width/2
+        this.punchY = this.playerY + 40
       }
       else{
         this.special1Bullet -= 2;
         this.currentlyUsingSpecial = true;
+        this.punchX = this.special1Bullet + this.playerX + this.width
+        this.punchY = this.playerY + 40
       }
     }
     else{
       this.special1Bullet = 0;
       this.currentlyUsingSpecial = false;
+      this.punchX = 0
+      this.punchY = 0
     }
   }
 
@@ -370,7 +379,7 @@ class Player{
       }
       
       //special key, subject to change
-      if(keyIsDown(54)){
+      if(keyIsDown(54) && this.playerY === 400){
         this.specialUseTime = millis();
       }
 
@@ -488,34 +497,35 @@ function draw() {
   }
 
   else if (gameMode === "playing"){
-    
+
     fill('white');
     rect(0,600,width,height);
     john.healthBar(100,100);
     jim.healthBar(windowWidth - 200,100);
-  
+    
+    
     //required functions for player 1
     john.display();
     john.playerInputs(1);
     john.hit();
     john.special1();
-  
+    
     //required functions for player 2
     jim.display();
     jim.playerInputs(2);
     jim.hit();
+    
     
     john.kick();
     jim.kick();
     //attacking
     john.punch();
     jim.punch();
-  
-  
+    
+    
     playerIsHit(john,jim);
     playerIsHit(jim,john);
-    john.punchX = 0;
-    jim.punchX = 0;
+
     if (john.health <= 0){
       winner = "jim";
       gameMode ="end";
@@ -532,7 +542,9 @@ function draw() {
     }
     else{
       background('grey');
-      text("player 1 wins!", width/2, height/2 - 20);
+      textSize(40);
+      text("player 1 wins!", width/2 - 20, height/2 - 20);
+      text("Click anywhere to return to the menu", width/2 - 40, height/2 + 20);
     }
   }
 }
@@ -707,7 +719,7 @@ function characterSelect(){
 
   //text for which character is which
   fill("white");  
-  text("Josh",characterSelectBoxX/5 + 40,characterSelectBoxY - 60);
+  text("Josh",characterSelectBoxX/4 - 10,characterSelectBoxY - 60);
   text("Jimmy",characterSelectBoxX/2 - 20, characterSelectBoxY - 60);
   text("Jack",characterSelectBoxX/2 + characterSelectBoxX/4 - 20, characterSelectBoxY - 60);
   rectMode(CORNER);
@@ -718,7 +730,7 @@ function characterSelect(){
 
 
 function playerIsHit(attacker,defender){
-  if ((attacker.currentlyAttacking || attacker.currentlyKicking) && (!defender.isBlocking || defender.isBlocking && !attacker.facingRight && !defender.facingRight || defender.isBlocking && attacker.facingRight && defender.facingRight)){
+  if ((attacker.currentlyAttacking || attacker.currentlyKicking || attacker.currentlyUsingSpecial) && (!defender.isBlocking || defender.isBlocking && !attacker.facingRight && !defender.facingRight || defender.isBlocking && attacker.facingRight && defender.facingRight)){
     if (attacker.punchX > defender.playerX + kickFactor && attacker.punchX < defender.playerX + defender.width + kickFactor){
       if (attacker.punchY > defender.playerY && attacker.punchY < defender.playerY + defender.height){
         console.log('y');
@@ -730,10 +742,15 @@ function playerIsHit(attacker,defender){
           defender.currentlyHit = true;
           defender.lastHit = millis();
         }
+        else if (defender.lastHit < millis - 250){
+          defender.currentlyHit = true;
+          defender.lastHit = millis()
+        }
       }
       else{
         console.log('n');
       }
     }
+    console.log(defender.playerX,attacker.punchX,defender.playerY,attacker.punchY)
   }
 }
