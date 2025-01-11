@@ -542,7 +542,7 @@ function draw() {
     }
     else{
       background('grey');
-      textSize(40);
+      textSize(20);
       text("player 1 wins!", width/2 - 20, height/2 - 20);
       text("Click anywhere to return to the menu", width/2 - 40, height/2 + 20);
     }
@@ -595,7 +595,11 @@ function mousePressed(){
     gameMode = "start screen";
     john.health = 100;
     jim.health = 100;
-
+    john.playerX = 100
+    jim.playerX = windowWidth - 100
+    john.character = ''
+    jim.character = ''
+    currentPlayerSelection = 1
   }
 }
 
@@ -737,12 +741,14 @@ function playerIsHit(attacker,defender){
         if (defender.lastHit < millis() - 750 && attacker.currentlyAttacking){
           defender.currentlyHit = true;
           defender.lastHit = millis();
+
         }
         else if(defender.lastHit < millis() - 1250 && attacker.currentlyKicking){
           defender.currentlyHit = true;
           defender.lastHit = millis();
+
         }
-        else if (defender.lastHit < millis - 250){
+        else if (defender.lastHit < millis() - 250 && attacker.currentlyUsingSpecial){
           defender.currentlyHit = true;
           defender.lastHit = millis()
         }
@@ -751,6 +757,6 @@ function playerIsHit(attacker,defender){
         console.log('n');
       }
     }
-    console.log(defender.playerX,attacker.punchX,defender.playerY,attacker.punchY)
+    console.log(defender.currentlyHit)
   }
 }
