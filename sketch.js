@@ -6,11 +6,11 @@
 // Extra for Experts:
 // N.A.
 // CURRENT TO DO LIST IN ORDER OF PRIORITY:
-//add something to the hit reg thing that checks if its a normal attack or a special, so it has to check less stuff
-//add diffrent looks for characters
 //add a way to change the special move depending on the character
-//GET AROUND TO ADDING COLLISIONS TO THE SPECIAL ATTACK YOU FOOL
+//NEED TO FIX THE HIT REG ON THE SECOND SPECIAL, AFTER THAT DO BETA TESTING. DONT WORRY ABOUT THE 3RD MOVE YET
+//TO FIX, TRY PUTTING THE 3* SPECIALS INTO 1 FUNCTION IN THE PLAYER CLASS SO THAT IT WILL SET THE SPECIAL1BULLET TO 0 ONLY WHEN NOT ATTACKING, THAT WAY IT WONT SET TO 0,0 BEFORE IT LOOKS FOR IF IT HIT
 //BETA TESTS AFTER THATS DONE, DONT DO MORE UNTIL THEN
+//Clean up the punch and kick. just have 1 thing that changes variables if facing right or left. like special 2
 //fix gravity, I'm not a fan of how it is now
 //...
 //make actual sprites for the characters
@@ -20,7 +20,7 @@
 
 //current issues:
 //IM GOING INSANE
-//SOMETHING IS WORKING LETS GOOOOOO!!!!!!!
+//I REALIZED WHAT I WAS DOING WRONG!!!!! LETS GOOOOOOOO!!!!!
 
 class Player{
   constructor(x,y){
@@ -74,9 +74,10 @@ class Player{
     this.character = '';
     this.specialUseTime = -2000;
     this.special1Bullet = 0;
-    this.special2RockX = 0;
-    this.special2RockY = 0;
+    this.rockFalling = false;
+    this.rockY = 0;
     this.currentlyUsingSpecial = false;
+    this.test = 5;
   }
 
   //displays the players
@@ -101,11 +102,8 @@ class Player{
       else{
         fill("grey");
         circle(this.playerX + this.width, this.playerY + 20, 10);  
-        //nose
-        // triangle(this.playerX + this.width, this.playerY + 30, this.playerX + this.width, this.playerY + 40, this.playerX + this.width + 5, this.playerY + 40);
         push();
         noStroke();
-        //rework these so it doesnt show on the players rectangle
         rect(this.playerX + this.width ,this.playerY + 40,5,20);
         triangle(this.playerX + this.width, this.playerY + 60, this.playerX + this.width + 5, this.playerY + 60, this.playerX + this.width, this.playerY + 90);
         pop();
@@ -114,7 +112,6 @@ class Player{
     else{
       circle(this.playerX, this.playerY + 20, 10);
 
-      //rework this for facing left
       if (this.character === "josh"){
         rectMode(CENTER);
         rect(this.playerX + this.width/2,this.playerY - 15, 50,30);
@@ -129,11 +126,8 @@ class Player{
       else{
         fill("grey");
         circle(this.playerX, this.playerY + 20, 10);  
-        //nose
-        // triangle(this.playerX + this.width, this.playerY + 30, this.playerX + this.width, this.playerY + 40, this.playerX + this.width + 5, this.playerY + 40);
         push();
         noStroke();
-        //rework these so it doesnt show on the players rectangle
         rect(this.playerX - 5 ,this.playerY + 40,5,20);
         triangle(this.playerX, this.playerY + 60, this.playerX - 5, this.playerY + 60, this.playerX , this.playerY + 90);
         pop();
@@ -170,6 +164,8 @@ class Player{
       this.playerY += this.gravity*this.airTime*1.5;
     }
   }
+
+  //REWORK THIS, SAME THING WITH THE KICK. THIS CAN BE SHORTER
   //the code for when punch is called in playerInputs
   punch(){
     if (millis() < this.oldTime + 750 && (this.playerY === 400 || this.playerY === 500)){
@@ -247,9 +243,10 @@ class Player{
       this.currentlyHit = false;
     }
   }
+
+  //NEED TO REWORK, WAY TO COMPLEX. USE A VARIABLE TO CHANGE THE VALUES THAT SWAP BETWEEN LEFT AND RIGHT FACING
   kick(){
     if (this.kickTime > millis() - 1290){
-      if (this.playerY === 400 || this.playerY === 500){
         //forward kick
         console.log(kickFactor);
         if (this.facingRight){
@@ -313,7 +310,7 @@ class Player{
           }
         }
       }
-    }
+    
     else{
       this.currentlyKicking = false;
       this.legDown = false;
@@ -325,6 +322,7 @@ class Player{
   //fire a projectile with a limited lifespan
   special1(){
     if (this.specialUseTime + 1000 > millis()){
+      fill("red")
       rect(this.playerX + this.width/2 + this.special1Bullet,this.playerY + 40, 40,20);
       if (this.facingRight){
         this.special1Bullet += 2;
@@ -340,16 +338,66 @@ class Player{
       }
     }
     else{
-      this.special1Bullet = 0;
+      if (!this.currentlyUsingSpecial){
+
+        this.special1Bullet = 0;
+      }
       this.currentlyUsingSpecial = false;
       this.punchX = 0
       this.punchY = 0
     }
   }
 
+  //Y VALUES ARE OFF WHEN FACING RIGHT, FIND OUT WHY
   //throw a rock
   special2(){
+    if (this.specialUseTime + 1800 > millis()){
+      fill("black");
+      if (this.facingRight){
+        this.special1Bullet += 1;
+        rockVar = this.width;
+      }
+      else{
+        rockVar = 0;
+        this.special1Bullet -= 1;
+      }
+      if(!this.rockFalling && this.test < 0){
+        this.rockFalling = true;
+      }
+      if (this.rockFalling){
+        this.rockY += this.test;
+        this.test += .2;
+      }
+      else{
+        this.rockY -= this.test;
+        this.test -= .1;
+      }
 
+      circle(this.special1Bullet + this.playerX + rockVar,this.rockY+this.playerY,20)
+      this.currentlyUsingSpecial = true;
+      this.punchX = this.special1Bullet + this.playerX + rockVar;
+      this.punchY = this.rockY + this.playerY;
+    }
+    else{
+      this.special1Bullet = 0;
+      this.rockY = 0;
+      this.test = 5;
+      this.rockFalling = false;
+      this.currentlyUsingSpecial = false;
+    }
+  }
+
+  special(){
+    if (this.character === "john"){
+      this.special1();
+      console.log("boo")
+    }
+    else if(this.character === "jimmy"){
+      this.special2()
+    }
+    else{
+      this.special1()
+    }
   }
   //all current possible player inputs
   playerInputs(player){
@@ -379,8 +427,12 @@ class Player{
       }
       
       //special key, subject to change
-      if(keyIsDown(54) && this.playerY === 400){
+      if(keyIsDown(this.specialKey) && this.playerY === 400){
         this.specialUseTime = millis();
+        console.log(this.character)
+
+        //DOESNT WORK ATM, FIX
+
       }
 
       //crouching
@@ -458,6 +510,7 @@ class Player{
 }
 
 let kickFactor = 0;
+let rockVar = 20
 let y = 0;
 let lastHit = 0;
 let gameMode = "start screen";
@@ -497,7 +550,7 @@ function draw() {
   }
 
   else if (gameMode === "playing"){
-
+    
     fill('white');
     rect(0,600,width,height);
     john.healthBar(100,100);
@@ -508,13 +561,15 @@ function draw() {
     john.display();
     john.playerInputs(1);
     john.hit();
-    john.special1();
+    john.special();
     
     //required functions for player 2
     jim.display();
     jim.playerInputs(2);
     jim.hit();
+    jim.special()
     
+    // console.log(jim.special1Bullet + jim.playerX,john.playerX,jim.rockY + jim.playerY,john.playerY)
     
     john.kick();
     jim.kick();
@@ -539,6 +594,8 @@ function draw() {
     if (winner === "jim"){
       background("grey");
       text("player 2 wins!", width/2, height/2 - 20);
+      text("Click anywhere to return to the menu", width/2 - 40, height/2 + 20);
+
     }
     else{
       background('grey');
@@ -685,6 +742,16 @@ function characterSelect(){
   fill("black");
   rectMode(CENTER);
   
+  if (currentPlayerSelection === 1){
+    textSize(25)
+    text("Player one, please use the mouse to select your character",width/3,height*2/3)
+  }
+  else{
+    textSize(25)
+    text("Player two, please use the mouse to select your character",width/3,height*2/3)
+  }
+  textSize(15)
+  
   //changing if the first box is selected
   if (mouseX >= characterSelectBoxX/4 - characterSelectBoxSideLength/2 && mouseX <= characterSelectBoxX/4 + characterSelectBoxSideLength/2 && mouseY >= characterSelectBoxY - characterSelectBoxSideLength/2  && mouseY <= characterSelectBoxY + characterSelectBoxSideLength/2){
     mouseHoveringOver = '1';
@@ -757,6 +824,6 @@ function playerIsHit(attacker,defender){
         console.log('n');
       }
     }
-    console.log(defender.currentlyHit)
+    console.log(attacker.punchX,defender.playerX,attacker.punchY,defender.playerY)
   }
 }
