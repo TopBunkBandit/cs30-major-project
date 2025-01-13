@@ -283,14 +283,20 @@ class Player{
       rect(0,0, 20, this.height/3);
       pop();
       //hitreg is the issue, fix
-      this.punchX = this.playerX + this.width/this.goingNuts + this.kickBalls;
+      //maybe, just maybe, change the X values and leave the Y values the same
+      if(this.facingRight){
+        this.punchX = this.playerX + this.width/this.goingNuts + this.kickBalls;
+      }
+      else{
+        this.punchX = this.playerX + this.width/this.goingNuts - this.kickBalls;
+      }
       this.punchY = this.playerY + this.height/3 + this.height/3 + this.kickBalls;
     }
     else{
       this.currentlyKicking = false;
       this.legDown = false;
       this.legRotation = 0;
-      this.kickBalls = 0;
+      this.kickBalls = 50;
       // this.punchX = 0;
       this.punchY -= 2;
     }
