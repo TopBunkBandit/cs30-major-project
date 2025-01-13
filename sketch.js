@@ -6,21 +6,17 @@
 // Extra for Experts:
 // N.A.
 // CURRENT TO DO LIST IN ORDER OF PRIORITY:
-//add a way to change the special move depending on the character
 //NEED TO FIX THE HIT REG ON THE SECOND SPECIAL, AFTER THAT DO BETA TESTING. DONT WORRY ABOUT THE 3RD MOVE YET
-//TO FIX, TRY PUTTING THE 3* SPECIALS INTO 1 FUNCTION IN THE PLAYER CLASS SO THAT IT WILL SET THE SPECIAL1BULLET TO 0 ONLY WHEN NOT ATTACKING, THAT WAY IT WONT SET TO 0,0 BEFORE IT LOOKS FOR IF IT HIT
+//BEGAN ADDING THE NEW LEG CODE, FIX HIT REG OR ADD MORE VARIABLES. THE ISSUE IS IN THE +- OF KICKBALLS, OR IT IS 
+//SOMETHING ELSE, AS THE Y VALUE IS ABOUT 100 TOO LARGE, THE X SEEMS TO BE WORKING JUST PEACHY
 //BETA TESTS AFTER THATS DONE, DONT DO MORE UNTIL THEN
 //Clean up the punch and kick. just have 1 thing that changes variables if facing right or left. like special 2
 //fix gravity, I'm not a fan of how it is now
 //...
-//make actual sprites for the characters
-//NOT A GREAT IDEA ITS GONNA TAKE TOO LONG
-//GREAT IDEA, PUT SPRITES OVER THE CURRENT THINGS AND KEEP THEM AS HITBOXES
-//THAT WAY THE HITBOXES DONT HAVE TO LOOK AWESOME
 
 //current issues:
 //IM GOING INSANE
-//I REALIZED WHAT I WAS DOING WRONG!!!!! LETS GOOOOOOOO!!!!!
+//LEG HIT REG
 
 class Player{
   constructor(x,y){
@@ -78,6 +74,7 @@ class Player{
     this.rockY = 0;
     this.currentlyUsingSpecial = false;
     this.test = 5;
+    this.goingNuts = 1;
   }
 
   //displays the players
@@ -170,6 +167,8 @@ class Player{
   punch(){
     if (millis() < this.oldTime + 750 && (this.playerY === 400 || this.playerY === 500)){
       kickFactor = 0;
+      fill("white");
+
       //forward punch
       if (this.facingRight){
         if (millis() < this.oldTime + 750/2){
@@ -244,77 +243,54 @@ class Player{
     }
   }
 
-  //NEED TO REWORK, WAY TO COMPLEX. USE A VARIABLE TO CHANGE THE VALUES THAT SWAP BETWEEN LEFT AND RIGHT FACING
   kick(){
     if (this.kickTime > millis() - 1290){
-        //forward kick
-        console.log(kickFactor);
-        if (this.facingRight){
-          kickFactor = -15;
-          if (this.legRotation > -75 && !this.legDown){
-            this.legRotation -= 2;
-            this.currentlyKicking = true;
-            // console.log(this.legRotation)
-            push();
-            translate(this.playerX + this.width/2,this.playerY + this.height/3 + this.height/3);
-            rotate(this.legRotation);
-            rect(0,0, 20, this.height/3);
-            pop();
-            this.kickBalls += 1;
-            this.punchX = this.playerX + this.width + this.kickBalls;
-            this.punchY = this.playerY + this.height/3 + this.height/3 + this.kickBalls;
-          }
-          else{
-            this.legDown = true;
-            this.legRotation += 2;
-            push();
-            rectMode(CORNERS);
-            translate(this.playerX + this.width/2 ,this.playerY + this.height/3 + this.height/3);            
-            rotate(this.legRotation);
-            rect(0,0, 20,this.height/3);
-            pop();
-            this.currentlyKicking = true;
-            this.kickBalls -= 1;
-            this.punchX = this.playerX + this.width + this.kickBalls;
-            this.punchY = this.playerY + this.height/3 + this.height/3 + this.kickBalls;
-          }
+      this.currentlyKicking = true;
+      if (this.facingRight){
+        kickFactor = -15;
+        this.goingNuts = 2;
+        if (this.legDown){
+          this.legRotation += 2;
+          this.kickBalls -= 1;
+        }
+        else if (this.legRotation > -75){
+          this.legRotation -= 2;
+          this.kickBalls += 1;
         }
         else{
-          kickFactor = 30;
-          if (this.legRotation < 75 && !this.legDown){
-            this.legRotation += 2;
-            this.currentlyKicking = true;
-            // console.log(this.legRotation);
-            push();
-            rectMode(CORNER);
-            translate(this.playerX + this.width/2 ,this.playerY + this.height/3 + this.height/3);
-            rotate(this.legRotation);
-            rect(0,0, 20, this.height/3);
-            pop();
-            this.kickBalls -= 1;
-            this.punchX = this.playerX + this.width/2  + this.kickBalls;
-            this.punchY = this.playerY + this.height/3 + this.height/3 - this.kickBalls;
-          }
-          else{
-            this.legDown = true;
-            this.legRotation -= 2;
-            push();
-            translate(this.playerX + this.width/2 ,this.playerY + this.height/3 + this.height/3);    
-            rotate(this.legRotation);
-            rect(0,0, 20,this.height/3);
-            pop();
-            this.currentlyKicking = true;
-            this.kickBalls += 1;
-            this.punchX = this.playerX + this.width/2 + this.kickBalls;
-            this.punchY = this.playerY + this.height/3 + this.height/3 + this.kickBalls;
-          }
+          this.legDown = true;
         }
       }
-    
+      else{
+        this.kickFactor = 30;
+        this.goingNuts = 1;
+        if (this.legDown){
+          this.legRotation -= 2;
+          this.kickBalls += 1;
+        }
+        else if (this.legRotation < 75){
+          this.legRotation += 2;
+          this.kickBalls -= 1;
+        }
+        else{
+          this.legDown = true;
+        }
+      }
+      push();
+      rectMode(CORNER);
+      translate(this.playerX + this.width/2 ,this.playerY + this.height/3 + this.height/3);
+      rotate(this.legRotation);
+      rect(0,0, 20, this.height/3);
+      pop();
+      //hitreg is the issue, fix
+      this.punchX = this.playerX + this.width/this.goingNuts + this.kickBalls;
+      this.punchY = this.playerY + this.height/3 + this.height/3 + this.kickBalls;
+    }
     else{
       this.currentlyKicking = false;
       this.legDown = false;
       this.legRotation = 0;
+      this.kickBalls = 0;
       // this.punchX = 0;
       this.punchY -= 2;
     }
@@ -322,19 +298,19 @@ class Player{
   //fire a projectile with a limited lifespan
   special1(){
     if (this.specialUseTime + 1000 > millis()){
-      fill("red")
+      fill("red");
       rect(this.playerX + this.width/2 + this.special1Bullet,this.playerY + 40, 40,20);
       if (this.facingRight){
         this.special1Bullet += 2;
         this.currentlyUsingSpecial = true;
-        this.punchX = this.special1Bullet + this.playerX + 3*this.width/2
-        this.punchY = this.playerY + 40
+        this.punchX = this.special1Bullet + this.playerX + 3*this.width/2;
+        this.punchY = this.playerY + 40;
       }
       else{
         this.special1Bullet -= 2;
         this.currentlyUsingSpecial = true;
-        this.punchX = this.special1Bullet + this.playerX + this.width
-        this.punchY = this.playerY + 40
+        this.punchX = this.special1Bullet + this.playerX + this.width;
+        this.punchY = this.playerY + 40;
       }
     }
     else{
@@ -343,12 +319,11 @@ class Player{
         this.special1Bullet = 0;
       }
       this.currentlyUsingSpecial = false;
-      this.punchX = 0
-      this.punchY = 0
+      this.punchX = 0;
+      this.punchY = 0;
     }
   }
 
-  //Y VALUES ARE OFF WHEN FACING RIGHT, FIND OUT WHY
   //throw a rock
   special2(){
     if (this.specialUseTime + 1800 > millis()){
@@ -366,14 +341,14 @@ class Player{
       }
       if (this.rockFalling){
         this.rockY += this.test;
-        this.test += .2;
+        this.test += 0.2;
       }
       else{
         this.rockY -= this.test;
-        this.test -= .1;
+        this.test -= 0.1;
       }
 
-      circle(this.special1Bullet + this.playerX + rockVar,this.rockY+this.playerY,20)
+      circle(this.special1Bullet + this.playerX + rockVar,this.rockY+this.playerY,20);
       this.currentlyUsingSpecial = true;
       this.punchX = this.special1Bullet + this.playerX + rockVar;
       this.punchY = this.rockY + this.playerY;
@@ -390,13 +365,13 @@ class Player{
   special(){
     if (this.character === "john"){
       this.special1();
-      console.log("boo")
+      console.log("boo");
     }
     else if(this.character === "jimmy"){
-      this.special2()
+      this.special2();
     }
     else{
-      this.special1()
+      this.special1();
     }
   }
   //all current possible player inputs
@@ -429,7 +404,7 @@ class Player{
       //special key, subject to change
       if(keyIsDown(this.specialKey) && this.playerY === 400){
         this.specialUseTime = millis();
-        console.log(this.character)
+        console.log(this.character);
 
         //DOESNT WORK ATM, FIX
 
@@ -510,7 +485,7 @@ class Player{
 }
 
 let kickFactor = 0;
-let rockVar = 20
+let rockVar = 20;
 let y = 0;
 let lastHit = 0;
 let gameMode = "start screen";
@@ -522,7 +497,7 @@ let currentPlayerSelection = 1;
 const TEXT_SPACING = 100;
 let controlArray = ["CONTROLS:","RIGHT","LEFT","CROUCH","JUMP","PUNCH","KICK","BLOCK","SPECIAL",];
 let playerInputsArray1 = ["PLAYER 1:","D","A","S","W","Q","F","E","6"];
-let playerInputsArray2 = ["PLAYER 2:","1 ON NUMPAD","3 ON NUMPAD","2 ON NUMPAD","5 ON NUMPAD","4 ON NUMPAD","7 ON NUMPAD","6 ON NUMPAD","9 ON NUMPAD",];
+let playerInputsArray2 = ["PLAYER 2 TURN ON NUM LOCK:","1 ON NUMPAD","3 ON NUMPAD","2 ON NUMPAD","5 ON NUMPAD","4 ON NUMPAD","7 ON NUMPAD","6 ON NUMPAD","9 ON NUMPAD",];
 let winner = "";
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -567,7 +542,7 @@ function draw() {
     jim.display();
     jim.playerInputs(2);
     jim.hit();
-    jim.special()
+    jim.special();
     
     // console.log(jim.special1Bullet + jim.playerX,john.playerX,jim.rockY + jim.playerY,john.playerY)
     
@@ -593,7 +568,7 @@ function draw() {
   else if (gameMode === "end"){
     if (winner === "jim"){
       background("grey");
-      text("player 2 wins!", width/2, height/2 - 20);
+      text("Player 2 wins!", width/2, height/2 - 20);
       text("Click anywhere to return to the menu", width/2 - 40, height/2 + 20);
 
     }
@@ -652,11 +627,11 @@ function mousePressed(){
     gameMode = "start screen";
     john.health = 100;
     jim.health = 100;
-    john.playerX = 100
-    jim.playerX = windowWidth - 100
-    john.character = ''
-    jim.character = ''
-    currentPlayerSelection = 1
+    john.playerX = 100;
+    jim.playerX = windowWidth - 100;
+    john.character = '';
+    jim.character = '';
+    currentPlayerSelection = 1;
   }
 }
 
@@ -743,14 +718,14 @@ function characterSelect(){
   rectMode(CENTER);
   
   if (currentPlayerSelection === 1){
-    textSize(25)
-    text("Player one, please use the mouse to select your character",width/3,height*2/3)
+    textSize(20);
+    text("Player one, please use the mouse to select your character",width/4,height*2/3);
   }
   else{
-    textSize(25)
-    text("Player two, please use the mouse to select your character",width/3,height*2/3)
+    textSize(20);
+    text("Player two, please use the mouse to select your character",width/4,height*2/3);
   }
-  textSize(15)
+  textSize(15);
   
   //changing if the first box is selected
   if (mouseX >= characterSelectBoxX/4 - characterSelectBoxSideLength/2 && mouseX <= characterSelectBoxX/4 + characterSelectBoxSideLength/2 && mouseY >= characterSelectBoxY - characterSelectBoxSideLength/2  && mouseY <= characterSelectBoxY + characterSelectBoxSideLength/2){
@@ -817,13 +792,13 @@ function playerIsHit(attacker,defender){
         }
         else if (defender.lastHit < millis() - 250 && attacker.currentlyUsingSpecial){
           defender.currentlyHit = true;
-          defender.lastHit = millis()
+          defender.lastHit = millis();
         }
       }
       else{
         console.log('n');
       }
     }
-    console.log(attacker.punchX,defender.playerX,attacker.punchY,defender.playerY)
+    console.log(attacker.punchX,defender.playerX,attacker.punchY,defender.playerY);
   }
 }
