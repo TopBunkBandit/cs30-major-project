@@ -1,22 +1,22 @@
 // 2D ARCADE FIGHTING GAME
 // THE COMMENTS ARE DEV NOTES, THEY ARE FOR HELPING ME NOT THE READER
+// SHOULD PROBABLY CHANGE THAT SOON
 // James Mitchell
+// DATE OF START
 // 11/20/24
-//
+// DATE OF FINISH
+// 1/XX/25
 // Extra for Experts:
 // N.A.
 // CURRENT TO DO LIST IN ORDER OF PRIORITY:
-//NEED TO FIX THE HIT REG ON THE SECOND SPECIAL, AFTER THAT DO BETA TESTING. DONT WORRY ABOUT THE 3RD MOVE YET
-//BEGAN ADDING THE NEW LEG CODE, FIX HIT REG OR ADD MORE VARIABLES. THE ISSUE IS IN THE +- OF KICKBALLS, OR IT IS 
-//SOMETHING ELSE, AS THE Y VALUE IS ABOUT 100 TOO LARGE, THE X SEEMS TO BE WORKING JUST PEACHY
 //BETA TESTS AFTER THATS DONE, DONT DO MORE UNTIL THEN
-//Clean up the punch and kick. just have 1 thing that changes variables if facing right or left. like special 2
-//fix gravity, I'm not a fan of how it is now
+//add special 3
+//make a special 3 array and a new function to check if any player is over a landmine.
+//special 3 is a landmine, make it drain 20 hp to use. when either character steps on it they lose 30 hp. let them spawn up to 5 land mines, and the 5th makes their hp 0//fix gravity, I'm not a fan of how it is now
 //...
 
 //current issues:
 //IM GOING INSANE
-//LEG HIT REG
 
 class Player{
   constructor(x,y){
@@ -73,8 +73,8 @@ class Player{
     this.rockFalling = false;
     this.rockY = 0;
     this.currentlyUsingSpecial = false;
-    this.test = 5;
-    this.goingNuts = 1;
+    this.rockSpeed = 5;
+    this.iDontKnowWhatThisDid = 1;
   }
 
   //displays the players
@@ -248,7 +248,7 @@ class Player{
       this.currentlyKicking = true;
       if (this.facingRight){
         kickFactor = -15;
-        this.goingNuts = 2;
+        this.iDontKnowWhatThisDid = 2;
         if (this.legDown){
           this.legRotation += 2;
           this.kickBalls -= 1;
@@ -263,14 +263,14 @@ class Player{
       }
       else{
         this.kickFactor = 30;
-        this.goingNuts = 1;
+        this.iDontKnowWhatThisDid = 1;
         if (this.legDown){
           this.legRotation -= 2;
-          this.kickBalls += 1;
+          this.kickBalls -= 1;
         }
         else if (this.legRotation < 75){
           this.legRotation += 2;
-          this.kickBalls -= 1;
+          this.kickBalls += 1;
         }
         else{
           this.legDown = true;
@@ -282,22 +282,20 @@ class Player{
       rotate(this.legRotation);
       rect(0,0, 20, this.height/3);
       pop();
-      //hitreg is the issue, fix
-      //maybe, just maybe, change the X values and leave the Y values the same
+      //Y wont work
       if(this.facingRight){
-        this.punchX = this.playerX + this.width/this.goingNuts + this.kickBalls;
+        this.punchX = this.playerX - this.width/4 + this.kickBalls;
       }
       else{
-        this.punchX = this.playerX + this.width/this.goingNuts - this.kickBalls;
+        this.punchX = this.playerX + this.width/this.iDontKnowWhatThisDid - this.kickBalls;
       }
-      this.punchY = this.playerY + this.height/3 + this.height/3 + this.kickBalls;
+      this.punchY = this.playerY + this.height/2 + this.kickBalls;
     }
     else{
       this.currentlyKicking = false;
       this.legDown = false;
       this.legRotation = 0;
       this.kickBalls = 50;
-      // this.punchX = 0;
       this.punchY -= 2;
     }
   }
@@ -320,10 +318,7 @@ class Player{
       }
     }
     else{
-      if (!this.currentlyUsingSpecial){
-
-        this.special1Bullet = 0;
-      }
+      this.special1Bullet = 0;
       this.currentlyUsingSpecial = false;
       this.punchX = 0;
       this.punchY = 0;
@@ -342,18 +337,17 @@ class Player{
         rockVar = 0;
         this.special1Bullet -= 1;
       }
-      if(!this.rockFalling && this.test < 0){
+      if(!this.rockFalling && this.rockSpeed < 0){
         this.rockFalling = true;
       }
       if (this.rockFalling){
-        this.rockY += this.test;
-        this.test += 0.2;
+        this.rockY += this.rockSpeed;
+        this.rockSpeed += 0.2;
       }
       else{
-        this.rockY -= this.test;
-        this.test -= 0.1;
+        this.rockY -= this.rockSpeed;
+        this.rockSpeed -= 0.1;
       }
-
       circle(this.special1Bullet + this.playerX + rockVar,this.rockY+this.playerY,20);
       this.currentlyUsingSpecial = true;
       this.punchX = this.special1Bullet + this.playerX + rockVar;
@@ -362,22 +356,40 @@ class Player{
     else{
       this.special1Bullet = 0;
       this.rockY = 0;
-      this.test = 5;
+      this.rockSpeed = 5;
       this.rockFalling = false;
       this.currentlyUsingSpecial = false;
     }
   }
 
+  special3(){
+    //figure it out
+    if (this.specialUseTime + 1000 > millis()){
+      fill("darkgreen");
+      this.currentlyUsingSpecial = true;
+      if (this.facingRight){
+        rect(this.playerX + this.width + 20,this.playerY + this.height - 20, 20,20);
+        // Minefield.push or something like that
+      }
+      else{
+        rect(this.playerX - 40,this.playerY + this.height - 20, 20,20);
+
+      }
+    }
+    else{
+      this.currentlyUsingSpecial = false;
+    }
+  }
+
   special(){
-    if (this.character === "john"){
+    if (this.character === "josh"){
       this.special1();
-      console.log("boo");
     }
     else if(this.character === "jimmy"){
       this.special2();
     }
     else{
-      this.special1();
+      this.special3();
     }
   }
   //all current possible player inputs
@@ -505,6 +517,7 @@ let controlArray = ["CONTROLS:","RIGHT","LEFT","CROUCH","JUMP","PUNCH","KICK","B
 let playerInputsArray1 = ["PLAYER 1:","D","A","S","W","Q","F","E","6"];
 let playerInputsArray2 = ["PLAYER 2 TURN ON NUM LOCK:","1 ON NUMPAD","3 ON NUMPAD","2 ON NUMPAD","5 ON NUMPAD","4 ON NUMPAD","7 ON NUMPAD","6 ON NUMPAD","9 ON NUMPAD",];
 let winner = "";
+let Minefield = [];
 function setup() {
   createCanvas(windowWidth, windowHeight);
   angleMode(DEGREES);
@@ -549,7 +562,6 @@ function draw() {
     jim.playerInputs(2);
     jim.hit();
     jim.special();
-    
     // console.log(jim.special1Bullet + jim.playerX,john.playerX,jim.rockY + jim.playerY,john.playerY)
     
     john.kick();
@@ -557,8 +569,7 @@ function draw() {
     //attacking
     john.punch();
     jim.punch();
-    
-    
+
     playerIsHit(john,jim);
     playerIsHit(jim,john);
 
