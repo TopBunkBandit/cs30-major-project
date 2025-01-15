@@ -9,11 +9,9 @@
 // Extra for Experts:
 // N.A.
 // CURRENT TO DO LIST IN ORDER OF PRIORITY:
-//BETA TESTS AFTER THATS DONE, DONT DO MORE UNTIL THEN
-//add special 3
-//make a special 3 array and a new function to check if any player is over a landmine.
-//special 3 is a landmine, make it drain 20 hp to use. when either character steps on it they lose 30 hp. let them spawn up to 5 land mines, and the 5th makes their hp 0//fix gravity, I'm not a fan of how it is now
-//...
+//fix gravity
+//make a background
+//maybe put some more color into this. its basically all black white and grey
 
 //current issues:
 //IM GOING INSANE
@@ -75,6 +73,7 @@ class Player{
     this.currentlyUsingSpecial = false;
     this.rockSpeed = 5;
     this.iDontKnowWhatThisDid = 1;
+    this.placedMines = false;
   }
 
   //displays the players
@@ -365,19 +364,33 @@ class Player{
   special3(){
     //figure it out
     if (this.specialUseTime + 1000 > millis()){
+      if (!this.placedMines){
+        if (this.facingRight){
+          minefield.push(this.playerX + this.width + 20);
+        }
+        else{
+          minefield.push(this.playerX - this.width - 20);
+        }
+        this.placedMines = true;
+        if (this.health > 30){
+          this.health -= 30;
+        }
+        else{
+          this.health = 1;
+        }
+      }
       fill("darkgreen");
       this.currentlyUsingSpecial = true;
       if (this.facingRight){
         rect(this.playerX + this.width + 20,this.playerY + this.height - 20, 20,20);
-        // Minefield.push or something like that
       }
       else{
         rect(this.playerX - 40,this.playerY + this.height - 20, 20,20);
-
       }
     }
     else{
       this.currentlyUsingSpecial = false;
+      this.placedMines = false;
     }
   }
 
@@ -424,8 +437,6 @@ class Player{
         this.specialUseTime = millis();
         console.log(this.character);
 
-        //DOESNT WORK ATM, FIX
-
       }
 
       //crouching
@@ -442,15 +453,20 @@ class Player{
         }
       }
       //moving forwards if not at the right wall
-      if (keyIsDown(this.forwardKey) && this.playerX < width - this.width){
-        this.playerX += 2;
-        this.facingRight = true;
+      if (keyIsDown(this.forwardKey) && this.playerX <= width - this.width){
+        this.playerX += 3;
+        if (!this.isBlocking){
+          this.facingRight = true;
+        }
       }
       //moving backward if not at the left wall
-      if (keyIsDown(this.backwardKey) && this.playerX !== 0){
-        this.playerX -= 2;
-        this.facingRight = false;
+      if (keyIsDown(this.backwardKey) && this.playerX >= 0){
+        this.playerX -= 3;
+        if (!this.isBlocking){
+          this.facingRight = false;
+        }
       }
+      
       //punching
       if (keyIsDown(this.punchKey)  && (this.playerY === 400 || this.playerY === 500)){
         this.oldTime = millis();
@@ -517,7 +533,7 @@ let controlArray = ["CONTROLS:","RIGHT","LEFT","CROUCH","JUMP","PUNCH","KICK","B
 let playerInputsArray1 = ["PLAYER 1:","D","A","S","W","Q","F","E","6"];
 let playerInputsArray2 = ["PLAYER 2 TURN ON NUM LOCK:","1 ON NUMPAD","3 ON NUMPAD","2 ON NUMPAD","5 ON NUMPAD","4 ON NUMPAD","7 ON NUMPAD","6 ON NUMPAD","9 ON NUMPAD",];
 let winner = "";
-let Minefield = [];
+let minefield = [];
 function setup() {
   createCanvas(windowWidth, windowHeight);
   angleMode(DEGREES);
@@ -572,6 +588,8 @@ function draw() {
 
     playerIsHit(john,jim);
     playerIsHit(jim,john);
+    mines(john)
+    mines(jim)
 
     if (john.health <= 0){
       winner = "jim";
@@ -788,12 +806,27 @@ function characterSelect(){
   rectMode(CORNER);
 }
 
+function mines(mistake){
+  for (let i = 0; i < minefield.length; i++){
+    rect(minefield[i],580,40,20);
+    if (mistake.facingRight){
+      if(mistake.playerX + mistake.width > minefield[i] && mistake.playerX + mistake.width< minefield[i]+40 && mistake.playerY + mistake.height > 580){
+        mistake.health -= 25;
+        minefield.splice(i,1);
+      }
+    }
+    else{
+      if(mistake.playerX > minefield[i] && mistake.playerX < minefield[i]+40 && mistake.playerY + mistake.height > 580){
+        mistake.health -= 25;
+        minefield.splice(i,1);
+      }
+    }
+  }
+}
 
 //adding hit detection to the players, not player collisions
-
-
 function playerIsHit(attacker,defender){
-  if ((attacker.currentlyAttacking || attacker.currentlyKicking || attacker.currentlyUsingSpecial) && (!defender.isBlocking || defender.isBlocking && !attacker.facingRight && !defender.facingRight || defender.isBlocking && attacker.facingRight && defender.facingRight)){
+  if ((attacker.currentlyAttacking || attacker.currentlyKicking || attacker.currentlyUsingSpecial) && (!defender.isBlocking || defender.isBlocking && !attacker.facingRight && !defender.facingRight || defender.isBlocking && attacker.facingRight && defender.facingRight || attacker.currentlyUsingSpecial)){
     if (attacker.punchX > defender.playerX + kickFactor && attacker.punchX < defender.playerX + defender.width + kickFactor){
       if (attacker.punchY > defender.playerY && attacker.punchY < defender.playerY + defender.height){
         console.log('y');
