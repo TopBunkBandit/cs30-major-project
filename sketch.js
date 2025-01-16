@@ -136,7 +136,7 @@ class Player{
   //the code for when jump is called in playerInputs
   jump(){
     this.playerY -= this.jumpVelocity;
-    this.airTime += 0.01;
+    this.airTime += 0.009;
     this.isJumping = true;
     // console.log(this.airTime)
   }
@@ -364,6 +364,7 @@ class Player{
   special3(){
     //figure it out
     if (this.specialUseTime + 1000 > millis()){
+      fill("darkgreen");
       if (!this.placedMines){
         if (this.facingRight){
           minefield.push(this.playerX + this.width + 20);
@@ -373,13 +374,12 @@ class Player{
         }
         this.placedMines = true;
         if (this.health > 30){
-          this.health -= 30;
+          this.health -= 25;
         }
         else{
           this.health = 1;
         }
       }
-      fill("darkgreen");
       this.currentlyUsingSpecial = true;
       if (this.facingRight){
         rect(this.playerX + this.width + 20,this.playerY + this.height - 20, 20,20);
@@ -410,27 +410,27 @@ class Player{
     if (!this.currentlyAttacking && !this.currentlyKicking && !this.currentlyUsingSpecial){
       //lets the code swap what keys its looking for
       //consider putting these in their own function and calling the whole thing during setup
-      if (player === 1){
-        this.jumpKey = 87;
-        this.forwardKey = 68;
-        this.backwardKey = 65;
-        this.crouchKey = 83;
-        this.punchKey = 81;
-        this.blockKey = 69;
-        this.kickKey = 70;
-        this.specialKey = 54;
-      }
-      else{
-        this.jumpKey = 101;
-        this.forwardKey = 99;
-        this.backwardKey = 97;
-        this.crouchKey = 98;
-        this.punchKey = 100;
-        this.blockKey = 102;
-        this.kickKey = 103;
-        this.specialKey = 105;
-
-      }
+      
+      // if (player === 1){
+      //   this.jumpKey = 87;
+      //   this.forwardKey = 68;
+      //   this.backwardKey = 65;
+      //   this.crouchKey = 83;
+      //   this.punchKey = 81;
+      //   this.blockKey = 69;
+      //   this.kickKey = 70;
+      //   this.specialKey = 54;
+      // }
+      // else{
+      //   this.jumpKey = 101;
+      //   this.forwardKey = 99;
+      //   this.backwardKey = 97;
+      //   this.crouchKey = 98;
+      //   this.punchKey = 100;
+      //   this.blockKey = 102;
+      //   this.kickKey = 103;
+      //   this.specialKey = 105;
+      // }
       
       //special key, subject to change
       if(keyIsDown(this.specialKey) && this.playerY === 400){
@@ -453,17 +453,17 @@ class Player{
         }
       }
       //moving forwards if not at the right wall
-      if (keyIsDown(this.forwardKey) && this.playerX <= width - this.width){
-        this.playerX += 3;
-        if (!this.isBlocking){
+      if (!this.isBlocking){
+        if (keyIsDown(this.forwardKey) && this.playerX <= width - this.width){
+          this.playerX += 3;
           this.facingRight = true;
+          
         }
-      }
-      //moving backward if not at the left wall
-      if (keyIsDown(this.backwardKey) && this.playerX >= 0){
-        this.playerX -= 3;
-        if (!this.isBlocking){
+        //moving backward if not at the left wall
+        if (keyIsDown(this.backwardKey) && this.playerX >= 0){
+          this.playerX -= 3;
           this.facingRight = false;
+          
         }
       }
       
@@ -534,26 +534,49 @@ let playerInputsArray1 = ["PLAYER 1:","D","A","S","W","Q","F","E","6"];
 let playerInputsArray2 = ["PLAYER 2 TURN ON NUM LOCK:","1 ON NUMPAD","3 ON NUMPAD","2 ON NUMPAD","5 ON NUMPAD","4 ON NUMPAD","7 ON NUMPAD","6 ON NUMPAD","9 ON NUMPAD",];
 let winner = "";
 let minefield = [];
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
   angleMode(DEGREES);
   //names are placeholders, will change later probabaly
   john = new Player(100,400);
   jim = new Player(windowWidth - 100,400);
+  displayJack = new Player(windowWidth/2,300);
+  displayJack.character = 'jack'
   jim.facingRight = false;
   characterSelectBoxX = windowWidth;
 
+  john.jumpKey = 87;
+  john.forwardKey = 68;
+  john.backwardKey = 65;
+  john.crouchKey = 83;
+  john.punchKey = 81;
+  john.blockKey = 69;
+  john.kickKey = 70;
+  john.specialKey = 54;
+
+  jim.jumpKey = 101;
+  jim.forwardKey = 99;
+  jim.backwardKey = 97;
+  jim.crouchKey = 98;
+  jim.punchKey = 100;
+  jim.blockKey = 102;
+  jim.kickKey = 103;
+  jim.specialKey = 105;
+  
 }
 
 function draw() {
   background(220);
-  //floor
 
   if(gameMode === "start screen"){
     mainMenu();
   }
   else if(gameMode === "controls"){
     displayControls();
+  }
+  else if(gameMode === "characters"){
+    characterDescription();
   }
   else if (gameMode === "character selection"){
     characterSelect();
@@ -588,8 +611,8 @@ function draw() {
 
     playerIsHit(john,jim);
     playerIsHit(jim,john);
-    mines(john)
-    mines(jim)
+    mines(john);
+    mines(jim);
 
     if (john.health <= 0){
       winner = "jim";
@@ -601,6 +624,7 @@ function draw() {
     }
   }
   else if (gameMode === "end"){
+    minefield = [];
     if (winner === "jim"){
       background("grey");
       text("Player 2 wins!", width/2, height/2 - 20);
@@ -609,7 +633,6 @@ function draw() {
     }
     else{
       background('grey');
-      textSize(20);
       text("player 1 wins!", width/2 - 20, height/2 - 20);
       text("Click anywhere to return to the menu", width/2 - 40, height/2 + 20);
     }
@@ -628,6 +651,9 @@ function mousePressed(){
     }
     else if (mouseHoveringOver === "main menu"){
       gameMode = "start screen";
+    }
+    else if (mouseHoveringOver === "characters"){
+      gameMode = "characters";
     }
     if(currentPlayerSelection === 1){
       if (mouseHoveringOver === "1"){
@@ -672,6 +698,9 @@ function mousePressed(){
 
 function mainMenu(){
   rectMode(CENTER);
+  textSize(20);
+  fill("black")
+  text("The Definitely Well Made Game",width/2 - 120,50)
   if(mouseX > width/2 - 200 && mouseX < width/2 + 200 && mouseY > height/4 - 25 && mouseY < height/4 +25){
     fill("white");
     rect(width/2,height/4,400,50);
@@ -698,8 +727,22 @@ function mainMenu(){
     rect(width/2,height/2.5,400,50);
     fill("white");
   }
-
   text("Controls", width/2 - 30, height/2.5 + 5);
+
+  if (mouseX > width/2 - 200 && mouseX < width/2 + 200 && mouseY > height/1.8 - 25 && mouseY < height/1.8 +25){
+    fill("white");
+    rect(width/2,height/1.8,400,50);
+    fill("black");
+    mouseHoveringOver = "characters";
+  }
+  else{
+    fill("black");
+    rect(width/2,height/1.8,400,50);
+    fill("white");
+  }
+
+  text("Characters", width/2 - 40, height/1.8 + 5);
+
   rectMode(CORNER);
 
 }
@@ -745,6 +788,62 @@ function displayControls(){
   }
 }
 
+function characterDescription(){
+  if (mouseX < width/3 && mouseY > height - 100){
+    characterDescriptionJohn();
+    fill("white");
+    rect(0,height - 100,width/3,100);
+    fill("black");
+  }
+  else{
+    fill("black");
+    rect(0,height - 100,width/3,100);
+    fill("white");
+  }
+  text("Josh",width/6 - 20,height - 50);
+
+  if (mouseX > width/3 && mouseX < width/1.5 && mouseY > height - 100){
+    characterDescriptionJimmy();
+    fill("white")
+    rect(width/3,height - 100,width/3,100)
+    fill("black")
+  }
+  else{
+    fill("black")
+    rect(width/3,height - 100,width/3,100)
+    fill("white")
+  }
+  text("Jimmy",width/2 - 30,height - 50);
+
+
+  if (mouseX > width/1.5 && mouseY > height - 100){
+    characterDescriptionJack();
+    fill("white");
+    rect(width/1.5,height - 100,width/3,100)
+    fill("black");
+  }
+  else{
+    fill("black");
+    rect(width/1.5,height - 100,width/3,100)
+    fill("white");
+  }
+  text("Jack",width - width/4.5,height - 50);
+
+}
+
+function characterDescriptionJack(){
+  fill("white");
+  rect(0,0,width,height - 100);
+  fill("black");
+  text("Jacks special is a landmine that costs 25 HP to use",windowWidth/2 - windowWidth/3,100)
+  displayJack.display();
+}
+function characterDescriptionJimmy(){
+
+}
+function characterDescriptionJohn(){
+
+}
 
 function characterSelect(){
   background("grey");
