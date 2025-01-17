@@ -9,12 +9,13 @@
 // Extra for Experts:
 // N.A.
 // CURRENT TO DO LIST IN ORDER OF PRIORITY:
-//fix gravity
 //make a background
 //maybe put some more color into this. its basically all black white and grey
+//fix gravity
 
 //current issues:
 //IM GOING INSANE
+//brain no work today
 
 class Player{
   constructor(x,y){
@@ -128,8 +129,6 @@ class Player{
         triangle(this.playerX, this.playerY + 60, this.playerX - 5, this.playerY + 60, this.playerX , this.playerY + 90);
         pop();
       }
-
-
     }
     fill("white");
   }
@@ -138,7 +137,6 @@ class Player{
     this.playerY -= this.jumpVelocity;
     this.airTime += 0.009;
     this.isJumping = true;
-    // console.log(this.airTime)
   }
   //the code for when falling is called in playerInputs
   falling(){
@@ -381,12 +379,6 @@ class Player{
         }
       }
       this.currentlyUsingSpecial = true;
-      if (this.facingRight){
-        rect(this.playerX + this.width + 20,this.playerY + this.height - 20, 20,20);
-      }
-      else{
-        rect(this.playerX - 40,this.playerY + this.height - 20, 20,20);
-      }
     }
     else{
       this.currentlyUsingSpecial = false;
@@ -406,36 +398,12 @@ class Player{
     }
   }
   //all current possible player inputs
-  playerInputs(player){
+  playerInputs(){
     if (!this.currentlyAttacking && !this.currentlyKicking && !this.currentlyUsingSpecial){
-      //lets the code swap what keys its looking for
-      //consider putting these in their own function and calling the whole thing during setup
-      
-      // if (player === 1){
-      //   this.jumpKey = 87;
-      //   this.forwardKey = 68;
-      //   this.backwardKey = 65;
-      //   this.crouchKey = 83;
-      //   this.punchKey = 81;
-      //   this.blockKey = 69;
-      //   this.kickKey = 70;
-      //   this.specialKey = 54;
-      // }
-      // else{
-      //   this.jumpKey = 101;
-      //   this.forwardKey = 99;
-      //   this.backwardKey = 97;
-      //   this.crouchKey = 98;
-      //   this.punchKey = 100;
-      //   this.blockKey = 102;
-      //   this.kickKey = 103;
-      //   this.specialKey = 105;
-      // }
       
       //special key, subject to change
       if(keyIsDown(this.specialKey) && this.playerY === 400){
         this.specialUseTime = millis();
-        console.log(this.character);
 
       }
 
@@ -542,7 +510,14 @@ function setup() {
   john = new Player(100,400);
   jim = new Player(windowWidth - 100,400);
   displayJack = new Player(windowWidth/2,300);
-  displayJack.character = 'jack'
+  displayJimmy = new Player(windowWidth/2,300);
+  displayJosh = new Player(windowWidth/2,300);
+
+
+  displayJack.character = 'jack';
+  displayJimmy.character = 'jimmy';
+  displayJosh.character = 'josh';
+
   jim.facingRight = false;
   characterSelectBoxX = windowWidth;
 
@@ -592,16 +567,15 @@ function draw() {
     
     //required functions for player 1
     john.display();
-    john.playerInputs(1);
+    john.playerInputs();
     john.hit();
     john.special();
     
     //required functions for player 2
     jim.display();
-    jim.playerInputs(2);
+    jim.playerInputs();
     jim.hit();
     jim.special();
-    // console.log(jim.special1Bullet + jim.playerX,john.playerX,jim.rockY + jim.playerY,john.playerY)
     
     john.kick();
     jim.kick();
@@ -699,8 +673,8 @@ function mousePressed(){
 function mainMenu(){
   rectMode(CENTER);
   textSize(20);
-  fill("black")
-  text("The Definitely Well Made Game",width/2 - 120,50)
+  fill("black");
+  text("The Definitely Well Made Game",width/2 - 120,50);
   if(mouseX > width/2 - 200 && mouseX < width/2 + 200 && mouseY > height/4 - 25 && mouseY < height/4 +25){
     fill("white");
     rect(width/2,height/4,400,50);
@@ -789,6 +763,8 @@ function displayControls(){
 }
 
 function characterDescription(){
+  fill("black")
+  text("Click anywhere to return to the Main Menu", width/2 - 100, height - 120);
   if (mouseX < width/3 && mouseY > height - 100){
     characterDescriptionJohn();
     fill("white");
@@ -801,48 +777,61 @@ function characterDescription(){
     fill("white");
   }
   text("Josh",width/6 - 20,height - 50);
+  fill("black")
+  text("Click anywhere to return to the Main Menu", width/2 - 100, height - 120);
 
   if (mouseX > width/3 && mouseX < width/1.5 && mouseY > height - 100){
     characterDescriptionJimmy();
-    fill("white")
-    rect(width/3,height - 100,width/3,100)
-    fill("black")
+    fill("white");
+    rect(width/3,height - 100,width/3,100);
+    fill("black");
   }
   else{
-    fill("black")
-    rect(width/3,height - 100,width/3,100)
-    fill("white")
+    fill("black");
+    rect(width/3,height - 100,width/3,100);
+    fill("white");
   }
   text("Jimmy",width/2 - 30,height - 50);
-
+  fill("black")
+  text("Click anywhere to return to the Main Menu", width/2 - 100, height - 120);
 
   if (mouseX > width/1.5 && mouseY > height - 100){
     characterDescriptionJack();
     fill("white");
-    rect(width/1.5,height - 100,width/3,100)
+    rect(width/1.5,height - 100,width/3,100);
     fill("black");
   }
   else{
     fill("black");
-    rect(width/1.5,height - 100,width/3,100)
+    rect(width/1.5,height - 100,width/3,100);
     fill("white");
   }
   text("Jack",width - width/4.5,height - 50);
-
+  fill("black")
+  text("Click anywhere to return to the Main Menu", width/2 - 100, height - 120);
+  mouseHoveringOver = "main menu";
 }
 
 function characterDescriptionJack(){
   fill("white");
   rect(0,0,width,height - 100);
   fill("black");
-  text("Jacks special is a landmine that costs 25 HP to use",windowWidth/2 - windowWidth/3,100)
+  text("X's special is a landmine that costs 25 HP to use",windowWidth/2 - windowWidth/3,100);
   displayJack.display();
 }
 function characterDescriptionJimmy(){
-
+  fill("white");
+  rect(0,0,width,height - 100);
+  fill("black");
+  text("X's special is a rock",windowWidth/2 - windowWidth/3,100);
+  displayJimmy.display();
 }
 function characterDescriptionJohn(){
-
+  fill("white");
+  rect(0,0,width,height - 100);
+  fill("black");
+  text("X's special is a projectile with a limited life span",windowWidth/2 - windowWidth/3,100);
+  displayJosh.display();
 }
 
 function characterSelect(){
@@ -902,12 +891,15 @@ function characterSelect(){
   text("Josh",characterSelectBoxX/4 - 10,characterSelectBoxY - 60);
   text("Jimmy",characterSelectBoxX/2 - 20, characterSelectBoxY - 60);
   text("Jack",characterSelectBoxX/2 + characterSelectBoxX/4 - 20, characterSelectBoxY - 60);
+
   rectMode(CORNER);
 }
 
 function mines(mistake){
   for (let i = 0; i < minefield.length; i++){
+    fill("darkgreen");
     rect(minefield[i],580,40,20);
+    fill("white");
     if (mistake.facingRight){
       if(mistake.playerX + mistake.width > minefield[i] && mistake.playerX + mistake.width< minefield[i]+40 && mistake.playerY + mistake.height > 580){
         mistake.health -= 25;
@@ -928,26 +920,19 @@ function playerIsHit(attacker,defender){
   if ((attacker.currentlyAttacking || attacker.currentlyKicking || attacker.currentlyUsingSpecial) && (!defender.isBlocking || defender.isBlocking && !attacker.facingRight && !defender.facingRight || defender.isBlocking && attacker.facingRight && defender.facingRight || attacker.currentlyUsingSpecial)){
     if (attacker.punchX > defender.playerX + kickFactor && attacker.punchX < defender.playerX + defender.width + kickFactor){
       if (attacker.punchY > defender.playerY && attacker.punchY < defender.playerY + defender.height){
-        console.log('y');
         if (defender.lastHit < millis() - 750 && attacker.currentlyAttacking){
           defender.currentlyHit = true;
           defender.lastHit = millis();
-
         }
         else if(defender.lastHit < millis() - 1250 && attacker.currentlyKicking){
           defender.currentlyHit = true;
           defender.lastHit = millis();
-
         }
-        else if (defender.lastHit < millis() - 250 && attacker.currentlyUsingSpecial){
+        else if (defender.lastHit < millis() - 200 && attacker.currentlyUsingSpecial){
           defender.currentlyHit = true;
           defender.lastHit = millis();
         }
       }
-      else{
-        console.log('n');
-      }
     }
-    console.log(attacker.punchX,defender.playerX,attacker.punchY,defender.playerY);
   }
 }
