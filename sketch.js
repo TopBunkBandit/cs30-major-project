@@ -1,21 +1,9 @@
 // 2D ARCADE FIGHTING GAME
-// THE COMMENTS ARE DEV NOTES, THEY ARE FOR HELPING ME NOT THE READER
-// SHOULD PROBABLY CHANGE THAT SOON
 // James Mitchell
 // DATE OF START
 // 11/20/24
 // DATE OF FINISH
-// 1/XX/25
-// Extra for Experts:
-// N.A.
-// CURRENT TO DO LIST IN ORDER OF PRIORITY:
-//make a background
-//maybe put some more color into this. its basically all black white and grey
-//fix gravity
-
-//current issues:
-//IM GOING INSANE
-//brain no work today
+// 1/21/25
 
 class Player{
   constructor(x,y){
@@ -27,7 +15,7 @@ class Player{
     this.height = 200;
     this.width = 50; 
     this.facingRight = true;
-    this.health = 100;
+    this.health = 175;
 
     //jumping
     this.gravity = 9.8;
@@ -159,8 +147,7 @@ class Player{
     }
   }
 
-  //REWORK THIS, SAME THING WITH THE KICK. THIS CAN BE SHORTER
-  //the code for when punch is called in playerInputs
+  //punching
   punch(){
     if (millis() < this.oldTime + 750 && (this.playerY === 400 || this.playerY === 500)){
       kickFactor = 0;
@@ -218,16 +205,18 @@ class Player{
       this.punchTime = 0;
     }
   }
+  //displays the health bar and updates it every frame
   healthBar(x,y){
     rectMode(CORNERS);
     fill("white");
     rect(x, y, x + 100,y+20);
     fill("red");
     for (let i = 0; i < this.health; i++){
-      rect(x,y, x + i, y+20);
+      rect(x,y, x + i/1.75, y+20);
     }
     rectMode(CORNER);
   }
+  //reduces the health of the player if they get hit
   hit(){
     if (this.currentlyHit){
       if (this.currentlyCrouched){
@@ -240,6 +229,7 @@ class Player{
     }
   }
 
+  //kicking
   kick(){
     if (this.kickTime > millis() - 1290){
       this.currentlyKicking = true;
@@ -296,6 +286,7 @@ class Player{
       this.punchY -= 2;
     }
   }
+
   //fire a projectile with a limited lifespan
   special1(){
     if (this.specialUseTime + 1000 > millis()){
@@ -359,26 +350,29 @@ class Player{
     }
   }
 
+  //places a rectangle that will 'explode' upon contact from anyone
   special3(){
-    //figure it out
     if (this.specialUseTime + 1000 > millis()){
+      this.currentlyUsingSpecial = true;
       fill("darkgreen");
-      if (!this.placedMines){
-        if (this.facingRight){
-          minefield.push(this.playerX + this.width + 20);
-        }
-        else{
-          minefield.push(this.playerX - this.width - 20);
-        }
-        this.placedMines = true;
-        if (this.health > 30){
-          this.health -= 25;
-        }
-        else{
-          this.health = 1;
+      if (this.health > 75) {
+        if (!this.placedMines){
+          if (this.facingRight){
+            minefield.push(this.playerX + this.width + 20);
+          }
+          else{
+            minefield.push(this.playerX - this.width - 20);
+          }
+          this.placedMines = true;
+          if (this.health > 30){
+            this.health -= 25;
+          }
+          else{
+            this.health = 1;
+          }
         }
       }
-      this.currentlyUsingSpecial = true;
+
     }
     else{
       this.currentlyUsingSpecial = false;
@@ -386,6 +380,7 @@ class Player{
     }
   }
 
+  //switches the special depending on the character preforming the action
   special(){
     if (this.character === "josh"){
       this.special1();
@@ -397,6 +392,7 @@ class Player{
       this.special3();
     }
   }
+  
   //all current possible player inputs
   playerInputs(){
     if (!this.currentlyAttacking && !this.currentlyKicking && !this.currentlyUsingSpecial){
@@ -440,7 +436,7 @@ class Player{
         this.oldTime = millis();
       }
       //blocking
-      if(keyIsDown(this.blockKey) && (this.playerY === 400 || this.playerY === 500)){
+      if(keyIsDown(this.blockKey) && this.playerY === 400 || this.playerY === 500){
         if (this.facingRight){
           rect(this.playerX + 40,this.playerY+20,20,this.height/2);
         }
@@ -486,6 +482,7 @@ class Player{
   }
 }
 
+//variables
 let kickFactor = 0;
 let rockVar = 20;
 let y = 0;
@@ -498,7 +495,7 @@ let mouseHoveringOver = 'none';
 let currentPlayerSelection = 1;
 const TEXT_SPACING = 100;
 let controlArray = ["CONTROLS:","RIGHT","LEFT","CROUCH","JUMP","PUNCH","KICK","BLOCK","SPECIAL",];
-let playerInputsArray1 = ["PLAYER 1:","D","A","S","W","Q","F","E","6"];
+let playerInputsArray1 = ["PLAYER 1:","D","A","S","W","Q","F","E","R"];
 let playerInputsArray2 = ["PLAYER 2 TURN ON NUM LOCK:","1 ON NUMPAD","3 ON NUMPAD","2 ON NUMPAD","5 ON NUMPAD","4 ON NUMPAD","7 ON NUMPAD","6 ON NUMPAD","9 ON NUMPAD",];
 let winner = "";
 let minefield = [];
@@ -506,7 +503,7 @@ let minefield = [];
 function setup() {
   createCanvas(windowWidth, windowHeight);
   angleMode(DEGREES);
-  //names are placeholders, will change later probabaly
+  //creating the 2 player classes and the 3 display classes
   john = new Player(100,400);
   jim = new Player(windowWidth - 100,400);
   displayJack = new Player(windowWidth/2,300);
@@ -521,6 +518,7 @@ function setup() {
   jim.facingRight = false;
   characterSelectBoxX = windowWidth;
 
+  //sets player 1 and 2's keys so they can call the same functions
   john.jumpKey = 87;
   john.forwardKey = 68;
   john.backwardKey = 65;
@@ -528,7 +526,7 @@ function setup() {
   john.punchKey = 81;
   john.blockKey = 69;
   john.kickKey = 70;
-  john.specialKey = 54;
+  john.specialKey = 82;
 
   jim.jumpKey = 101;
   jim.forwardKey = 99;
@@ -543,7 +541,7 @@ function setup() {
 
 function draw() {
   background(220);
-
+  //a basic loop that will trigger the corresponding mode
   if(gameMode === "start screen"){
     mainMenu();
   }
@@ -577,17 +575,19 @@ function draw() {
     jim.hit();
     jim.special();
     
+    //attacking
     john.kick();
     jim.kick();
-    //attacking
     john.punch();
     jim.punch();
 
+    //checking for damage
     playerIsHit(john,jim);
     playerIsHit(jim,john);
     mines(john);
     mines(jim);
 
+    //game end conditions
     if (john.health <= 0){
       winner = "jim";
       gameMode ="end";
@@ -613,8 +613,8 @@ function draw() {
   }
 }
 
+//depending on what the mouse has selected changes what will happen
 function mousePressed(){
-  // john.health -= 10;
   if (gameMode !== "end"){
 
     if (mouseHoveringOver === "start"){
@@ -660,8 +660,8 @@ function mousePressed(){
   }
   else{
     gameMode = "start screen";
-    john.health = 100;
-    jim.health = 100;
+    john.health = 175;
+    jim.health = 175;
     john.playerX = 100;
     jim.playerX = windowWidth - 100;
     john.character = '';
@@ -763,7 +763,7 @@ function displayControls(){
 }
 
 function characterDescription(){
-  fill("black")
+  fill("black");
   text("Click anywhere to return to the Main Menu", width/2 - 100, height - 120);
   if (mouseX < width/3 && mouseY > height - 100){
     characterDescriptionJohn();
@@ -777,7 +777,7 @@ function characterDescription(){
     fill("white");
   }
   text("Josh",width/6 - 20,height - 50);
-  fill("black")
+  fill("black");
   text("Click anywhere to return to the Main Menu", width/2 - 100, height - 120);
 
   if (mouseX > width/3 && mouseX < width/1.5 && mouseY > height - 100){
@@ -792,7 +792,7 @@ function characterDescription(){
     fill("white");
   }
   text("Jimmy",width/2 - 30,height - 50);
-  fill("black")
+  fill("black");
   text("Click anywhere to return to the Main Menu", width/2 - 100, height - 120);
 
   if (mouseX > width/1.5 && mouseY > height - 100){
@@ -807,7 +807,7 @@ function characterDescription(){
     fill("white");
   }
   text("Jack",width - width/4.5,height - 50);
-  fill("black")
+  fill("black");
   text("Click anywhere to return to the Main Menu", width/2 - 100, height - 120);
   mouseHoveringOver = "main menu";
 }
@@ -917,7 +917,7 @@ function mines(mistake){
 
 //adding hit detection to the players, not player collisions
 function playerIsHit(attacker,defender){
-  if ((attacker.currentlyAttacking || attacker.currentlyKicking || attacker.currentlyUsingSpecial) && (!defender.isBlocking || defender.isBlocking && !attacker.facingRight && !defender.facingRight || defender.isBlocking && attacker.facingRight && defender.facingRight || attacker.currentlyUsingSpecial)){
+  if ((attacker.currentlyAttacking || attacker.currentlyKicking || attacker.currentlyUsingSpecial) && (!defender.isBlocking || defender.isBlocking && !attacker.facingRight && !defender.facingRight || defender.isBlocking && attacker.facingRight && defender.facingRight || attacker.currentlyUsingSpecial) || attacker.currentlyKicking && defender.currentlyCrouched){
     if (attacker.punchX > defender.playerX + kickFactor && attacker.punchX < defender.playerX + defender.width + kickFactor){
       if (attacker.punchY > defender.playerY && attacker.punchY < defender.playerY + defender.height){
         if (defender.lastHit < millis() - 750 && attacker.currentlyAttacking){
